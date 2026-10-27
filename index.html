@@ -157,12 +157,13 @@ details.tech .dec{margin-top:14px;font-size:15px}
 .cv dd{margin:0;min-width:0;font-weight:500}
 .cv dd small{display:block;color:var(--muted);font-size:13.5px;font-weight:400;margin-top:2px}
 
-.contact{display:flex;flex-wrap:wrap;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:24px 28px}
-.contact .addr{font-family:var(--f-mono);font-size:17px;user-select:all;font-weight:500}
-.contact button{font-family:var(--f-body);font-size:13.5px;font-weight:500;padding:8px 14px;border:1px solid var(--line2);border-radius:999px;background:var(--surface2);color:var(--fg);cursor:pointer;transition:background .15s}
-.contact button:hover{background:var(--bg2)}
-.contact a{text-decoration:none;font-size:14px;padding:8px 14px;border-radius:999px;background:var(--bg2);color:var(--fg)}
-.contact a:hover{background:var(--fg);color:var(--bg)}
+.contact{display:flex;flex-direction:column;gap:14px;padding-top:4px}
+.contact .addr{font-family:var(--f-display);font-weight:800;font-size:clamp(24px,4vw,34px);letter-spacing:-.02em;user-select:all;line-height:1.2}
+.contact .row{display:flex;flex-wrap:wrap;align-items:center;gap:6px 22px;font-family:var(--f-mono);font-size:13.5px}
+.contact button{font:inherit;padding:0;border:0;background:none;color:var(--muted);cursor:pointer;text-decoration:underline;text-underline-offset:4px}
+.contact button:hover{color:var(--fg)}
+.contact a{color:var(--muted);text-decoration:none;border-bottom:1px solid var(--line2);padding-bottom:1px}
+.contact a:hover{color:var(--fg);border-color:var(--fg)}
 footer{color:var(--muted);font-size:12.5px;font-family:var(--f-mono);text-align:center}
 
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
@@ -406,10 +407,12 @@ footer{color:var(--muted);font-size:12.5px;font-family:var(--f-mono);text-align:
   <h2>연락</h2>
   <div class="contact">
     <span class="addr" id="email">sungwoon@zenithasset.co.kr</span>
-    <button type="button" id="copy">주소 복사</button>
-    <a href="https://github.com/wjdtjddns98" class="mono">github.com/wjdtjddns98 ↗</a>
-    <a href="https://github.com/N-utti" class="mono">github.com/N-utti ↗</a>
-    <a href="https://app.notion.com/p/Nutti-36ea47166046800690bef4b2c63b81da?source=copy_link" class="mono">Notion 워크스페이스 ↗</a>
+    <div class="row">
+      <button type="button" id="copy">주소 복사</button>
+      <a href="https://github.com/wjdtjddns98">GitHub</a>
+      <a href="https://github.com/N-utti">GitHub · N-utti</a>
+      <a href="https://app.notion.com/p/Nutti-36ea47166046800690bef4b2c63b81da?source=copy_link">Notion</a>
+    </div>
   </div>
 </section>
 
