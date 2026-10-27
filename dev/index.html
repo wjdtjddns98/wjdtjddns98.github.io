@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="description" content="AI 백엔드 개발자 정성운 — 프로젝트별 설계 결정·실측 수치·시연 영상">
+<meta name="description" content="AI 백엔드 개발자 정성운 — 프로젝트별 아키텍처·트러블슈팅·실측 수치·시연 영상">
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 </head>
 <body>
@@ -185,13 +185,21 @@ footer{color:var(--muted);font-size:12.5px;font-family:var(--f-mono);text-align:
 .skills{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px 28px}
 .skills > div{display:flex;flex-direction:column;gap:8px;min-width:0}
 .skills b{font-family:var(--f-display);font-size:14px;font-weight:800}
+.arch{background:var(--surface2);border:1px solid var(--line);border-radius:var(--r-sm);padding:14px 18px;font-size:14.5px;line-height:1.7}
+.arch b{font-weight:600}
+.ts{width:100%;border-collapse:collapse;font-size:13.5px;line-height:1.5}
+.ts th,.ts td{text-align:left;vertical-align:top;padding:8px 10px;border-top:1px solid var(--line)}
+.ts th{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.06em;color:var(--muted);font-weight:500;border-top:0}
+.ts td:first-child{font-weight:600;white-space:nowrap}
+.tswrap{overflow-x:auto}
+@media (max-width:640px){.ts{min-width:640px}}
 </style>
 
 <div class="wrap">
 
 <nav><div class="in">
   <a class="me" href="#top">정성운</a>
-  <ul><li><a href="#projects">프로젝트</a></li><li><a href="#principles">설계 원칙</a></li><li><a href="#more">그 외</a></li><li><a href="#skills">기술</a></li><li><a href="#about">소개</a></li></ul>
+  <ul><li><a href="#projects">프로젝트</a></li><li><a href="#principles">설계 원칙</a></li><li><a href="#tests">테스트</a></li><li><a href="#more">그 외</a></li><li><a href="#skills">기술</a></li><li><a href="#about">소개</a></li></ul>
 </div></nav>
 
 <header id="top">
@@ -247,6 +255,7 @@ footer{color:var(--muted);font-size:12.5px;font-family:var(--f-mono);text-align:
     </dl>
     <div class="ledger">
       <div><span class="v">343</span><span class="k">백엔드 테스트 함수</span></div>
+    <div class="arch"><b>아키텍처.</b> FastAPI 프로세스 하나가 REST · WebSocket(채팅·알림·presence) · Yjs 릴레이(pycrdt)를 함께 담고, PostgreSQL 16(FTS tsvector 생성 컬럼 + pgvector) · Redis(세션·presence) · MinIO(첨부) 를 쓴다. Caddy 가 TLS 와 정적 프론트를 맡고, 외부 접속은 Tailscale. AI 호출은 <span class="mono">app/ai/provider.py</span> 한 곳으로만 나가고, 임베딩은 사내 Ollama 의 bge-m3. 답변 생성은 백그라운드 태스크가 DB 에 쓰고 WebSocket 은 구독만 한다. 권한 판정은 서비스 계층 함수 한 곳(<span class="mono">can_view_*</span>)으로 모아 REST·검색·AI 도구가 같은 함수를 부른다. Alembic 마이그레이션, pg_dump 일일 백업, Prometheus 지표, Docker Compose 로 서버 한 대에 배포.</div>
       <div><span class="v">56ms</span><span class="k">통합검색 · 메시지 6만 건 규모</span></div>
       <div><span class="v">14.7ms</span><span class="k">채팅 전달 p95 (로컬 측정)</span></div>
       <div><span class="v">487</span><span class="k">머지된 PR · 백엔드는 단독</span></div>
@@ -296,6 +305,20 @@ footer{color:var(--muted);font-size:12.5px;font-family:var(--f-mono);text-align:
         <dt>10-26</dt><dd>계약 변경 4건 당일 프론트 인수. 커밋 484 · PR 487(본인 99) · 테스트 343</dd>
       </dl></div>
     </div>
+    <div class="deep"><div><h4>트러블슈팅 — 운영일지에서</h4>
+<div class="tswrap"><table class="ts"><thead><tr><th>증상</th><th>원인</th><th>수정</th><th>검증</th></tr></thead><tbody>
+<tr><td>휴지통 보낸 문서 제목이 "지운 사람"으로 덮어써짐 (09-17)</td><td>휴지통 이동 뒤에도 공동편집 방이 안 걷혀 편집자의 마지막 저장이 뒤늦게 반영</td><td>close_room 이 dirty 플래그를 내리도록 (#106)</td><td>재현 테스트 동봉, 102→112 green</td></tr>
+<tr><td>메시지 6만 건에서 검색·목록 느림 (09-21)</td><td>문서·버전 목록이 본문 스냅샷까지 읽고, 검색이 매번 tsvector 계산</td><td>스냅샷 defer(#144), 채널 마지막 메시지 쿼리(#145), tsvector 생성 컬럼 + GIN(#147)</td><td>zenith_perf DB 실측: 버전 목록 233→17ms, 검색 ~300→56ms</td></tr>
+<tr><td>개발 DB 연결마다 2초 지연 (09-21)</td><td>Windows 에서 localhost 가 IPv6 먼저 풀리며 타임아웃</td><td>개발용 호스트 localhost → 127.0.0.1 (#148)</td><td>연결 지연 재측정</td></tr>
+<tr><td>채팅 첨부: 긴 한글 파일명 500, 인증 전 대용량 업로드로 디스크 참 (09-11)</td><td>파일명 헤더 인코딩 미처리, FastAPI 가 인증 전에 multipart 를 다 받음</td><td>파일명 인코딩 수정, 인증 전 Content-Length 12MB 차단 미들웨어 (#58)</td><td>MinIO 위 테스트 97건 로컬·CI</td></tr>
+<tr><td>WS 거부가 전부 HTTP 403, yjs 저장 실패 시 유실 (10-06)</td><td>핸드셰이크 거부 코드 미정의, 저장 실패 복구 경로 없음, refresh 동시 호출 경합</td><td>close code 4401/4404/1013, yjs 저장 실패 복구, refresh 10초 유예 (#343)</td><td>207 tests, 보안민감이라 리뷰 2회</td></tr>
+<tr><td>AI 검색 "09.30 기습 미팅 요약본" 0건 (10-15)</td><td>FTS 토크나이저가 날짜·버전·호스트명 토큰을 쪼갬</td><td>토큰 분리 규칙 수정 (#408)</td><td>해당 질의 재현 테스트</td></tr>
+<tr><td>문서 평문에 서식 태그가 섞여 검색·AI 근거 오염 (10-15)</td><td>평문(text_cache) 생성이 태그를 안 걸러냄</td><td>태그 제거 + 평문 재생성 스크립트 (#405)</td><td>재생성 후 검색 결과 대조</td></tr>
+<tr><td>AI 스트리밍 중 연결 끊기면 답변 유실 (10-15)</td><td>생성이 HTTP 커넥션 수명에 묶임</td><td>생성을 커넥션에서 분리, 되읽기·이어받기 (#430)</td><td>프론트 "AI 대화 복원" 연동 확인</td></tr>
+<tr><td>벡터 색인 중 임베딩 실패 시 옛 청크 잔존, 동시 색인 경합 (10-13)</td><td>비동기 색인에 직렬화·실패 처리 없음</td><td>색인 직렬화, fail-closed(실패해도 옛 청크 삭제), 질문 임베딩 8초 타임아웃 → FTS 폴백 (#374)</td><td>하이브리드 RRF 테스트</td></tr>
+<tr><td>채널명 매칭 깨짐 (10-26)</td><td>한글 호환 자모가 NFKC 정규화에서 안 걸러짐</td><td>정규화 보정 (#531)</td><td>101 tests green</td></tr>
+</tbody></table></div>
+    </div></div>
     <div class="stack"><span>Claude API (tool use)</span><span>pgvector</span><span>bge-m3</span><span>FastAPI</span><span>PostgreSQL 16</span><span>WebSocket</span><span>Yjs/pycrdt</span><span>MinIO</span><span>Docker Compose</span><span>Caddy</span><span>Tailscale</span><span>GitHub Actions</span></div>
     <div class="links"><a href="https://github.com/N-utti/zenith">GitHub ↗</a><span class="label">배포: 사내망 전용</span></div>
   </article>
@@ -315,6 +338,7 @@ footer{color:var(--muted);font-size:12.5px;font-family:var(--f-mono);text-align:
     </dl>
     <div class="ledger">
       <div><span class="v">$0.211→$0.053</span><span class="k">이미지 1장 생성 단가 · 약 4배 절감</span></div>
+    <div class="arch"><b>아키텍처.</b> api 컨테이너(FastAPI·Tortoise ORM) 와 worker 컨테이너가 PostgreSQL 하나를 큐로 공유한다. 업로드·품질 체크 → <span class="mono">jobs</span> 행 삽입 → 워커가 <span class="mono">FOR UPDATE SKIP LOCKED</span> 로 집어 lease 를 걸고 fal 경유 GPT Image 호출 → 결과 1장을 Cloudflare R2 에 저장 → 클라이언트는 HTTP 폴링. 크레딧은 <span class="mono">credit_ledger</span> append-only, 잔액은 SUM. 카페24 주문 웹훅 → dedupe_key 로 적립, 실패·안전 차단 → refund 행. 2GB VPS 한 대에 Docker Compose + Caddy, 5분 주기 운영 모니터링 웹훅(대기열·워커 사망·메모리·디스크).</div>
       <div><span class="v">~280장/h</span><span class="k">워커 슬롯 4개 · 장당 p95 59초</span></div>
       <div><span class="v">0건</span><span class="k">QA에서 실패 후 환불 누락</span></div>
       <div><span class="v">229</span><span class="k">테스트 · 2GB VPS 한 대 운영</span></div>
@@ -325,6 +349,49 @@ footer{color:var(--muted);font-size:12.5px;font-family:var(--f-mono);text-align:
       <li><span><b>크레딧 원장.</b> 지우지 않고 쌓기만 하는 원장에 dedupe_key로 멱등성을 보장했습니다. 생성 실패나 안전 차단 시에는 자동으로 환불합니다.</span></li>
       <li><span><b>외부 제약을 실측으로 확인하고 재설계.</b> 카페24 OAuth가 운영자 전용이라 고객 계정은 연동할 수 없다는 걸 확인했습니다. Admin API로 회원을 조회한 뒤 SMS OTP로 본인을 확인하는 방식으로 바꿨습니다.</span></li>
     </ul>
+    <div class="deep">
+      <div><h4>잡 큐 — Redis 없이</h4>
+      <ol class="flow">
+        <li><b>집기</b><span class="mono">SELECT … FOR UPDATE SKIP LOCKED LIMIT 1</span> 과 <span class="mono">status→running, locked_by, locked_until</span> 갱신을 한 트랜잭션에</li>
+        <li><b>lease</b>워커가 죽으면 <span class="mono">locked_until</span> 이 지나 다른 워커가 집음. 하트비트로 연장</li>
+        <li><b>완료</b><span class="mono">UPDATE … WHERE locked_by=나 AND locked_until>now()</span>. 조건 불일치면 내 결과를 버림(중복 완료 방지)</li>
+        <li><b>동시 처리</b>WORKER_CONCURRENCY 로 프로세스 안 asyncio 동시 실행. 외부 API 대기가 대부분이라 워커 수를 늘리기 전에 이걸로</li>
+        <li><b>실패</b>예외·안전 차단은 <span class="mono">failed</span> + 사유 저장 + 크레딧 자동 환불</li>
+        <li><b>한계 기준</b>초당 수백 잡 또는 워커 수십 개가 되면 Redis Streams 로. 문서에 적어 둠</li>
+      </ol></div>
+      <div><h4>크레딧 원장 (ADR-01·02)</h4>
+      <ul class="mods">
+        <li><b>append-only</b> <span>수정·삭제 없음. 잔액은 SUM, 캐시 잔액과 원장 SUM 을 비교하는 검증 쿼리</span></li>
+        <li><b>dedupe_key</b> <span><span class="mono">order:1234</span> 처럼 이벤트 키 UNIQUE — 웹훅이 두 번 와도 한 번만 적립</span></li>
+        <li><b>자동 환불</b> <span>생성 실패·안전 차단 시 <span class="mono">refund:&lt;job_uuid&gt;</span> 행. 역시 멱등</span></li>
+        <li><b>음수 허용</b> <span>주문 취소 회수 때 이미 써 버렸으면 음수. 막으면 회수가 안 됨</span></li>
+        <li><b>보상 규칙</b> <span>무료 체험 1, 쇼핑몰 연동 +3, 주문 +20. 게스트 → 회원 병합 시 원장도 병합</span></li>
+      </ul></div>
+      <div><h4>연표</h4>
+      <dl class="log">
+        <dt>08-03</dt><dd>착수. 로드맵 ① 인증 → ② 스타일·크레딧 → ③ 생성 파이프라인 → ④ 마감·배포</dd>
+        <dt>08-12</dt><dd>① 완료: 게스트 JWT, 카카오·네이버·로컬 로그인, 게스트→회원 병합. 테스트 52</dd>
+        <dt>08-20</dt><dd>ADR-02 주문 취소 시 크레딧 전액 회수, human_face_policy=warn 확정. 미결 카드 Q1~Q9 해소</dd>
+        <dt>08-28~31</dt><dd>관리자 API 5종으로 /admin 스텁 전부 제거, 카페24 주문 보상 동기화 cron. 테스트 229</dd>
+        <dt>09-02</dt><dd>보안 후속 6건: OAuth state nonce, 크레딧 부호 검증, 레이트리밋, 로그 토큰 마스킹</dd>
+        <dt>09-04</dt><dd>WORKER_CONCURRENCY 도입(3건 동시 59초 vs 순차 150초), 5분 주기 운영 모니터링 웹훅</dd>
+        <dt>09-10</dt><dd>이미지 단가 $0.211 → $0.053 (fal quality 명시), R2 전환</dd>
+        <dt>09-14</dt><dd>7일간 실생성 72건 확인. 이후 트래픽 부재로 드랍, 서버 내림</dd>
+      </dl></div>
+    </div>
+    <div class="deep"><div><h4>트러블슈팅 — 운영일지에서</h4>
+<div class="tswrap"><table class="ts"><thead><tr><th>증상</th><th>원인</th><th>수정</th><th>검증</th></tr></thead><tbody>
+<tr><td>워커 2대가 같은 잡을 집어 크레딧 이중 차감 위험 (#63)</td><td>queued 조회와 lease 전이가 별도 트랜잭션 — SKIP LOCKED 락 공백</td><td>조회·잠금·전이를 한 트랜잭션으로</td><td>PG 임시 DB 에 워커 2개 동시 기동 실측, 117 passed</td></tr>
+<tr><td>테스트가 실행 순서에 따라 실패</td><td>Tortoise 전역 EXECUTOR_CACHE 에 앞 테스트 executor 잔존</td><td>conftest autouse 픽스처로 매 테스트 캐시 clear</td><td>순서 섞어도 green</td></tr>
+<tr><td>OAuth state 미바인딩 → 계정 탈취 가능 (보안 리뷰 UNSAFE, 08-04)</td><td>state 선택·재사용 가능·세션 미바인딩, 기본 서명키로 기동 허용</td><td>state 필수 + DB 저장 + 일회성 원자 소비, 기본키 기동 거부, /auth/guest 레이트리밋 (#8)</td><td>재리뷰 SAFE</td></tr>
+<tr><td>가입 TOCTOU, 무제한 비밀번호 대입 (#21)</td><td>중복 검사와 insert 비원자, 실패 계수 없음</td><td>UNIQUE + IntegrityError→409, 실패 횟수 락아웃</td><td>보안 리뷰 2차 SAFE</td></tr>
+<tr><td>"인스타에 올리기"가 프로덕션에서만 실패 (#215)</td><td><img> 가 무-CORS(opaque) 로 캐시한 응답을 fetch 가 재사용</td><td>fetch(url, {cache:"no-store"})</td><td>play 오리진 재현·수정 확인</td></tr>
+<tr><td>R2 전환 후 기존 이미지 전부 404</td><td>전환 전 볼륨 미이관 + Cloudflare 가 404 를 엣지 캐시</td><td>boto3 로 볼륨→R2 이관, 호스트 퍼지</td><td>DB 키 32개 head_object 전수 200</td></tr>
+<tr><td>없는 /assets/*.js 가 200 HTML + immutable 캐시 (#222)</td><td>Caddy SPA fallback 이 자산 경로까지 포함, CORS expose_headers 누락</td><td>fallback 을 not path /assets/* + not file 로, Retry-After 노출</td><td>caddy 도커 7케이스 + 프로덕션 스모크</td></tr>
+<tr><td>fal.ai 과금이 예상의 4배, 2초 만에 succeeded</td><td>quality 미전달 시 기본 high, FAL_KEY 미로딩으로 dev 폴백</td><td>quality=medium 명시, 1~2초면 폴백 의심 규칙 (#110·#146)</td><td>실측 중앙값 47.4초를 avg_seconds 로</td></tr>
+<tr><td>첫 배포: caddy 재시작 루프, DB 재생성 (#193)</td><td>caddy 만 env_file 누락, up -d 가 전 서비스 재생성</td><td>caddy env_file 추가, 앱만 --no-deps 재기동</td><td>TLS 발급·헬스 확인, 런북 반영</td></tr>
+</tbody></table></div>
+    </div></div>
     <div class="stack"><span>GPT Image (fal)</span><span>FastAPI</span><span>Tortoise ORM</span><span>PostgreSQL</span><span>Cloudflare R2</span><span>카페24 API</span><span>Docker Compose</span><span>Caddy</span></div>
     <div class="links"><a href="https://github.com/N-utti/nutti-photo-playground">GitHub ↗</a><span class="label">배포: 종료 (서버 내림)</span></div>
   </article>
@@ -343,6 +410,7 @@ footer{color:var(--muted);font-size:12.5px;font-family:var(--f-mono);text-align:
     </dl>
     <div class="ledger">
       <div><span class="v">884→73ms</span><span class="k">검수 큐 2.4만 행 조회 · 12배 개선</span></div>
+    <div class="arch"><b>아키텍처.</b> Python 크롤러 워커(연속 크롤 모드, 하트비트 워치독) · FastAPI(검수 API·관리자 API) · React 검수 웹앱(프론트 동료) 이 PostgreSQL 하나를 공유한다. 소스별 <span class="mono">discovery_cursor</span> 로 재개 지점을 저장하고, <span class="mono">crawl_job</span>·<span class="mono">backfill_job</span> 상태를 DB 에 두어 재시작 뒤 running 인데 하트비트가 오래된 잡을 pending 으로 되돌린다. 발견 원장(<span class="mono">discovered_company</span>) → 실존 확인 → 추출 → <span class="mono">review_queue</span> → <span class="mono">review_audit</span>(append-only). 외부 API 호출은 <span class="mono">cost_ledger</span> 에 단가×횟수로 기록하고 월 상한에 닿으면 디스패치를 멈춘다. API 키 없이 전 단계를 가짜 응답으로 도는 dry-run 이 기본값이라 CI 가 실키 없이 끝까지 돈다. 사내 Windows 서버에서 supervisor + Job Object 로 프로세스 관리.</div>
       <div><span class="v">43,347</span><span class="k">발견한 기업 원장 (MVP 시점)</span></div>
       <div><span class="v">1,771</span><span class="k">검증 대기 이메일 · 실존 기업 1,498곳</span></div>
       <div><span class="v">1,383</span><span class="k">테스트 함수 · 본인 PR 402/516</span></div>
@@ -390,6 +458,20 @@ footer{color:var(--muted);font-size:12.5px;font-family:var(--f-mono);text-align:
         <dt>10-23</dt><dd>v1.40.0. 커밋 648(본인 534) · PR 516(본인 402) · 테스트 1,383</dd>
       </dl></div>
     </div>
+    <div class="deep"><div><h4>트러블슈팅 — 운영일지에서</h4>
+<div class="tswrap"><table class="ts"><thead><tr><th>증상</th><th>원인</th><th>수정</th><th>검증</th></tr></thead><tbody>
+<tr><td>기업정보 디렉토리가 공식 홈페이지로 2.1만 건 오채택 (08-10)</td><td>LLM 캡 소진 → 제목 토큰 폴백 채택, 도메인 dedup 없이 승격</td><td>블록리스트 +115, 한 도메인 = 한 회사, 캡 소진 시 폴백 금지 (#341)</td><td>1시간 실측 재유입 0, 검수분은 pg_dump 로 복원</td></tr>
+<tr><td>검수 큐 로딩 0.9초/페이지 (08-10)</td><td>ORDER BY 의 상관 서브쿼리가 24,470행마다 실행</td><td>aliased LEFT JOIN (#344)</td><td>EXPLAIN ANALYZE 884→73ms, 회귀 150</td></tr>
+<tr><td>상장 여부 모르는 소스의 법인이 listed 로 저장·승격 (09-10)</td><td>소스 세그먼트 미적용, 저장 가드 부재</td><td>세그먼트·저장 가드, 동일 계열 차단 (#483)</td><td>테스트 3케이스, 오염 1.8만 행 UPDATE</td></tr>
+<tr><td>재부팅 후 반복 잡 10개가 32시간 정지 (09-14)</td><td>기동 시 DB 미준비로 resume 1회 실패 후 재시도 없음</td><td>티커가 매 틱 고아 running 잡을 자동 재개 (#491)</td><td>재부팅 시나리오 재현</td></tr>
+<tr><td>US 백필 114곳이 존재 검사에서 탈락 (09-16)</td><td>WAF 가 프로브를 403 으로 막아 산 사이트를 죽은 것으로 판정</td><td>연락처를 이미 뽑은 본문은 생존 인정, confidence 하향 (#503)</td><td>114곳 재판정</td></tr>
+<tr><td>세그먼트 디스패치 2일 정지 (09-23)</td><td>구독 토큰 호출이 cost_ledger 에 가짜 누계로 집계돼 예산 캡 도달</td><td>구독 호출은 0원 집계 (#512), 정지 시 알림</td><td>원장 재집계 후 재개</td></tr>
+<tr><td>승격 배치가 300/674 에서 정체 (09-01)</td><td>무응답 도메인 하나가 pool.map 순서 소비를 막음</td><td>FIRST_COMPLETED 완료 순 소비 (#460)</td><td>같은 잡 재실행 완주</td></tr>
+<tr><td>승격 워커가 수 분 멈춤, 진행 0 (09-01)</td><td>이메일 난독화 복원 정규식의 ReDoS 가 GIL 점유</td><td>공백 런 선형 처리 (#465)</td><td>스레드 스택 덤프로 확정, 200k 텍스트 0.14s→0.001s</td></tr>
+<tr><td>좀비 크롤 잡이 영구 running (07-08)</td><td>프로세스 사망 시 상태 복구 없음</td><td>하트비트 워치독 감지·정리·재기동 (#201), 자식 트리만 kill (#359)</td><td>24/7 운영</td></tr>
+<tr><td>캠페인 발송 중 SMTP 421→452→535 계정 차단 (10-15)</td><td>1초 간격 ~680통 연속 발송이 의심 트래픽 판정</td><td>발송 간격 3초, 앱 비밀번호 재발급</td><td>로그인 235, 테스트 수신 확인</td></tr>
+</tbody></table></div>
+    </div></div>
     <div class="stack"><span>Claude Vision</span><span>LLM 분류·중재</span><span>Python</span><span>httpx</span><span>Playwright</span><span>OCR</span><span>FastAPI</span><span>PostgreSQL</span><span>SQLAlchemy</span><span>DART·EDGAR·GLEIF API</span><span>Docker</span></div>
     <div class="links"><a href="https://github.com/wjdtjddns98/lead-crawler">GitHub ↗</a><span class="label">배포: 사내망 전용</span></div>
   </article>
@@ -406,6 +488,18 @@ footer{color:var(--muted);font-size:12.5px;font-family:var(--f-mono);text-align:
     <div><b>권한은 서버가 판정한다</b><span>프론트의 마스킹은 편의일 뿐, 차단은 API 의 403. 검색 결과의 권한 필터는 SQL 안에서, AI 도구도 질문자 권한 그대로. 전부 계정 4종 × 엔드포인트 매트릭스 테스트로 고정.</span></div>
     <div><b>측정하고 바꾼다</b><span>EXPLAIN ANALYZE 로 상관 서브쿼리 24,470회를 찾아 12배, 영상 모델 4회 교체, 이미지 단가 4배 절감. 바꾸기 전 수치와 바꾼 뒤 수치를 같이 남깁니다.</span></div>
     <div><b>키 없이도 전 구간이 돈다</b><span>외부 API 파이프라인은 dry-run 이 기본값, CI 는 실키 없이 끝까지. OpenAPI 계약 테스트가 FE↔BE 명세 어긋남을 타입 단계에서 잡습니다.</span></div>
+  </div>
+</section>
+
+<section id="tests">
+  <h2>테스트 — "2,000+" 에 붙는 내용</h2>
+  <div class="ways">
+    <div><b>권한 매트릭스</b><span>제니스: 계정 4종(사원·임원·결재선 멤버·외부인) × 엔드포인트로 200/403 표를 고정. 새 엔드포인트는 이 표에 행을 추가하는 게 규칙.</span></div>
+    <div><b>OpenAPI 계약 테스트</b><span><span class="mono">backend/openapi.json</span> 을 커밋하고, 테스트가 "현재 코드가 만드는 스키마 = 커밋된 파일"인지 검사. 프론트는 그 파일에서 타입을 생성해 계약 변경이 타입 단계에서 깨진다.</span></div>
+    <div><b>동시성 테스트</b><span>댓글봇: 같은 매치에 승인 2건을 <span class="mono">asyncio.gather</span> 로 동시에 → sent 1행·409 1건. 놀이터: 워커 2개가 같은 잡을 집지 않는지. 원장 잔액 = SUM 검증.</span></div>
+    <div><b>dry-run CI</b><span>리드크롤러·쇼츠: 외부 API 를 가짜 응답으로 바꿔 전 단계가 키 없이 돈다. CI 가 실키 없이 끝까지 재현. Python 3.11/3.12/3.13 매트릭스.</span></div>
+    <div><b>회귀 테스트로 사고를 닫는다</b><span>쿼리 최적화 150개, 비용 원장 정지·오라벨·중복 병합 각각 재현 테스트. 사고는 테스트가 추가돼야 닫힌 것으로.</span></div>
+    <div><b>누출 테스트</b><span>댓글봇 토큰이 응답·로그·URL 에 안 나오는지, 놀이터 외부 API 토큰이 로그에 안 남는지를 테스트로 고정. 보안 수정은 테스트 없이는 머지 안 함.</span></div>
   </div>
 </section>
 
@@ -454,6 +548,16 @@ footer{color:var(--muted);font-size:12.5px;font-family:var(--f-mono);text-align:
       <li><span><b>왜 접었나.</b> 만드는 쪽은 자동화됐지만 보는 사람을 모으는 쪽은 아니었습니다. 조회수와 전환이 따라오지 않았고, 콘텐츠를 어떻게 퍼뜨릴지는 개발로 풀 수 있는 문제가 아니었습니다.</span></li>
       <li><span><b>남긴 것.</b> 팩트체크를 fail-safe 로 두는 구조(결과 마커 없으면 FAIL, 대본은 데이터 구간으로 격리), 편당 비용 원장, dry-run 기본값은 이후 프로젝트에 그대로 가져갔습니다.</span></li>
     </ul>
+    <div class="deep"><div><h4>트러블슈팅 — 운영일지에서</h4>
+<div class="tswrap"><table class="ts"><thead><tr><th>증상</th><th>원인</th><th>수정</th><th>검증</th></tr></thead><tbody>
+<tr><td>자막이 □(tofu) 로 렌더 (07-13)</td><td>한글 경로 폰트를 ffmpeg 가 못 열고 조용히 기본 폰트로 폴백</td><td>ASCII 임시 경로로 폰트 복사 (#99)</td><td>라이브 3편 완주</td></tr>
+<tr><td>스티칭 결과 재생 불가 회귀 (06-29)</td><td>출력 픽셀 포맷 yuv444p</td><td>yuv420p 강제</td><td>재생 확인 후 릴리스</td></tr>
+<tr><td>9:16 멀티비트 제출 간헐 400, 다운로드 302 실패</td><td>Veo extend 간헐 400, GCS 리다이렉트 때 API 키 누락</td><td>제출 재시도, 302 추적 + 키 전달 (#22·#23·#56)</td><td>완주율 확보</td></tr>
+<tr><td>Kontext 시작 프레임이 검정/퇴화 (06-16, 07-14)</td><td>data URI 레퍼런스를 못 읽음, 안전필터 오탐</td><td>fal-storage 업로드 후 https URL (#69), 오탐 시 주제 제외 폴백 (#102)</td><td>5컷 동일 캐릭터, QC 재시도 0회</td></tr>
+<tr><td>팩트체크가 항상 FAIL (#60)</td><td>폴백 프롬프트의 도구 지시 충돌로 모델이 도구 호출을 텍스트로 지어냄</td><td>폴백 프롬프트 분리 → 텍스트는 Claude 로 롤백 (#66)</td><td>대본 생성 안정화</td></tr>
+<tr><td>비트 사이 ~5초 정지 (06-16)</td><td>8초 고정 클립에 대사가 ~3초</td><td>대사 40~48자로 8초 채움 (#73)</td><td>발화 7.3~7.6초 실측</td></tr>
+</tbody></table></div>
+    </div></div>
     <div class="stack"><span>Claude tool use</span><span>Claude Vision</span><span>Veo 3.1 (fal.ai)</span><span>FLUX Kontext</span><span>Python</span><span>FFmpeg</span><span>Telegram Bot</span><span>YouTube API</span><span>Docker</span><span>Ofelia</span></div>
     <div class="links"><a href="https://github.com/wjdtjddns98/Auto-advertisement-Solution">GitHub ↗</a><a href="https://www.youtube.com/@%EB%88%84%EB%9D%A0%EC%95%BC%EC%95%8C%EB%A0%A4%EC%A4%98">YouTube 채널 ↗</a></div>
   </article>
@@ -483,6 +587,16 @@ footer{color:var(--muted);font-size:12.5px;font-family:var(--f-mono);text-align:
       <li><span><b>자격증명 구조적 보호.</b> 토큰은 별도 테이블에 Fernet으로 암호화하고 MultiFernet으로 키를 회전합니다. 응답·로그·URL에 노출되지 않는 것을 테스트로 고정했습니다.</span></li>
       <li><span><b>최소 아키텍처.</b> 별도 워커, Redis, JWT를 과설계로 기각하고 Postgres와 프로세스 안 스케줄러로 운영합니다. 워커를 분리할 부하 기준은 미리 문서로 정해 두었습니다.</span></li>
     </ul>
+    <div class="deep"><div><h4>트러블슈팅 — 운영일지에서</h4>
+<div class="tswrap"><table class="ts"><thead><tr><th>증상</th><th>원인</th><th>수정</th><th>검증</th></tr></thead><tbody>
+<tr><td>실패 회계 backoff 가 경합 시 틀림 (07-23)</td><td>read-modify-write TOCTOU</td><td>조건부 원자 UPDATE (#64)</td><td>리뷰 재점검</td></tr>
+<tr><td>poll↔reconcile 상태가 어긋나 health 배지 부정확 (07-24)</td><td>두 경로가 같은 행을 비원자 갱신</td><td>조건부 원자 update 2건 (#74)</td><td>2차 리뷰</td></tr>
+<tr><td>같은 게시물에 답글 두 번 (08-11)</td><td>소스를 갈아타면 매치 unique 가 우회됨</td><td>external_post_id 인덱스 + 409 (#93)</td><td>불변식 테스트 추가</td></tr>
+<tr><td>Threads 계정 중복 증식, 소스 고아화 (08-11)</td><td>수동 토큰 등록이 안정 식별자 없이 계정 생성</td><td>안정 식별자 물림 (#86), 참조 소스 있는 계정 삭제 거부 (#94)</td><td>마이그레이션·테스트·콘솔 실측</td></tr>
+<tr><td>수동 검색(poll-now) 이 스케줄 틱과 동시 fetch (09-02)</td><td>락 없이 두 경로가 같은 소스 폴링</td><td>소스별 lock 직렬화(409), 10초 쿨다운(429 + Retry-After), 429→502 오매핑 수정 (#117)</td><td>신규 건수 집계 검증</td></tr>
+<tr><td>승인 1건이 두 번 게시될 위험</td><td>승인 클릭 중복·재시도</td><td>CAS UPDATE … WHERE status IN(…) RETURNING, 0행이면 abort + sent partial unique index</td><td>동시 승인 2건 → 발송 1건 라이브 실증</td></tr>
+</tbody></table></div>
+    </div></div>
     <div class="stack"><span>FastAPI</span><span>Tortoise ORM</span><span>PostgreSQL</span><span>APScheduler</span><span>Fernet</span><span>argon2</span><span>세션+CSRF</span><span>Threads API</span></div>
     <div class="links"><a href="https://github.com/wjdtjddns98/auto-comment-bot">GitHub ↗</a><span class="label">배포: 사내망 전용</span></div>
   </article>
