@@ -17,6 +17,8 @@
 .mods li b{font-weight:600}
 .mods li span{color:var(--muted)}
 @media (max-width:480px){.log{grid-template-columns:1fr}}
+.ba.demo{grid-template-columns:1fr}
+.vid.wide{aspect-ratio:16/9;max-height:none}
 </style>
 </head>
 <body>
@@ -247,6 +249,10 @@ footer{color:var(--muted);font-size:12.5px;font-family:var(--f-mono);text-align:
     <div class="head"><h3>제니스 Zenith</h3><span class="pill">개발 중 · 사내 테스트</span></div>
     <div class="meta"><span>01 / 03</span><span>2026.08 – 현재</span><span>백엔드 겸 PM · 2인 팀(프론트 1)</span></div>
     <p class="one">채팅·문서 공동편집·등급별 게시판·전자결재·근태에 사내 문서를 근거로 답하는 AI 어시스턴트를 합친 15명 규모 사내 협업툴.</p>
+    <div class="ba demo">
+      <figure><figcaption>시연 영상 · 7분 · 문서 공동편집 → 채팅 /ai 각주 → 등급별 게시판 → 전자결재</figcaption>
+      <div class="vid wide"><video controls preload="none" playsinline poster="../media/zenith-demo.jpg" src="../media/zenith-demo.mp4"></video></div></figure>
+    </div>
     <dl class="ps">
       <dt>문제</dt><dd>업무 대화와 문서가 외부 SaaS 여러 곳에 흩어져 있었고, 회사 문서를 알고 답해 주는 AI 가 없었습니다.</dd>
       <dt>해결</dt><dd>자체 서버 한 대에 모으고, 문서·게시글·결재·근태를 도구로 읽는 AI 어시스턴트를 얹었습니다. AI 호출은 provider 모듈 한 곳으로만 나가게 경계를 두어 공급자를 바꿔도 나머지 코드는 그대로입니다.</dd>
