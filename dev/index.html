@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="AI 백엔드 개발자 정성운 — 프로젝트 7개의 역할·설계 결정·실측 수치">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>정성운 포트폴리오</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gothic+A1:wght@400;600;800&family=IBM+Plex+Sans+KR:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* 레이아웃: 상단 고정 내비 + 사진이 있는 머리 + 수치 4칸, 프로젝트는 '원장' 수치 행과 결정 기록. 장식 없이 숫자와 결정이 주인공. */
+:root{
+  --bg:#F3F6F7; --surface:#FFFFFF; --fg:#15212B; --muted:#5B6873; --line:#D5DDE2;
+  --accent:#0E6B63; --accent-soft:#E0EFED; --warn:#9A5B00; --warn-soft:#FBEFD9;
+  --f-display:"Gothic A1","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --f-body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0F161B; --surface:#151F26; --fg:#E3E9ED; --muted:#93A1AB; --line:#26333C;
+  --accent:#55C2B5; --accent-soft:#163430; --warn:#E6B15C; --warn-soft:#33281A; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F161B; --surface:#151F26; --fg:#E3E9ED; --muted:#93A1AB; --line:#26333C;
+  --accent:#55C2B5; --accent-soft:#163430; --warn:#E6B15C; --warn-soft:#33281A; color-scheme:dark}
+
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:16px;line-height:1.7}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.wrap{max-width:880px;margin:0 auto;padding-block:32px 80px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:flex;flex-direction:column;gap:72px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.25}
+p{margin:0}
+a{color:var(--accent)}
+a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.mono{font-family:var(--f-mono)}
+.label{font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.todo{background:var(--warn-soft);color:var(--warn);padding:0 6px;border-radius:4px;font-size:.9em}
+section > h2{font-size:24px;font-weight:800;margin-bottom:20px}
+
+/* 내비 */
+nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--bg);border-bottom:1px solid var(--line);
+  margin-inline:calc(-1 * max(16px,env(safe-area-inset-left,0px))) calc(-1 * max(16px,env(safe-area-inset-right,0px)));
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:10px}
+nav .in{max-width:880px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+nav .me{font-family:var(--f-display);font-weight:800;text-decoration:none;color:var(--fg)}
+nav ul{display:flex;gap:18px;margin:0;padding:0;list-style:none;font-size:14px}
+nav ul a{color:var(--muted);text-decoration:none}
+nav ul a:hover{color:var(--accent)}
+
+/* 머리 */
+header{display:grid;grid-template-columns:1fr;gap:28px;align-items:start}
+header .txt{display:flex;flex-direction:column;gap:16px;min-width:0}
+header .role{font-size:14px;color:var(--muted)}
+header h1{font-size:clamp(34px,6vw,52px);font-weight:800;letter-spacing:-.01em}
+header .thesis{font-family:var(--f-display);font-weight:800;font-size:clamp(22px,3.6vw,30px);line-height:1.3}
+header .thesis em{font-style:normal;color:var(--accent)}
+header .lede{font-size:17px;max-width:36em}
+.cta{display:flex;flex-wrap:wrap;gap:10px}
+.cta a{font-family:var(--f-mono);font-size:14px;text-decoration:none;padding:8px 14px;border-radius:6px;border:1px solid var(--accent)}
+.cta a.pri{background:var(--accent);color:var(--surface)}
+.photo{width:180px;aspect-ratio:3/4;max-width:100%;border-radius:10px;background:var(--accent-soft);border:1px solid var(--line);overflow:hidden;display:flex;align-items:center;justify-content:center;text-align:center;padding:12px;font-size:13px;color:var(--muted)}
+.photo img{width:100%;height:100%;object-fit:cover;display:block}
+.stats{grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.stats div{background:var(--surface);padding:14px 16px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.stats .v{font-family:var(--f-mono);font-size:22px;font-weight:500;font-variant-numeric:tabular-nums}
+.stats .k{font-size:13px;color:var(--muted);line-height:1.45}
+
+/* 공통 방식 */
+.ways{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.ways div{background:var(--surface);padding:18px 20px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.ways b{font-family:var(--f-display);font-weight:800;font-size:16px}
+.ways span{color:var(--muted);font-size:14.5px}
+
+/* 타임라인 */
+.timeline{overflow-x:auto}
+.tl{display:grid;grid-template-columns:120px repeat(6,1fr);min-width:620px;font-size:13px;row-gap:6px}
+.tl .m{font-family:var(--f-mono);color:var(--muted);border-left:1px solid var(--line);padding-left:6px}
+.tl .n{font-weight:600;padding-right:8px;white-space:nowrap}
+.tl .bar{height:14px;border-radius:3px;background:var(--accent);align-self:center}
+.tl .bar.maint{background:var(--accent-soft);border:1px solid var(--accent)}
+
+/* 프로젝트 */
+.proj{display:flex;flex-direction:column;gap:56px}
+article{display:flex;flex-direction:column;gap:18px;padding-top:28px;border-top:2px solid var(--fg)}
+.head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px 16px}
+.head h3{font-size:26px;font-weight:800}
+.meta{display:flex;flex-wrap:wrap;gap:6px 14px;font-family:var(--f-mono);font-size:13px;color:var(--muted)}
+.pill{font-family:var(--f-mono);font-size:12px;padding:2px 8px;border-radius:99px;border:1px solid var(--accent);color:var(--accent)}
+.pill.done{background:var(--accent);color:var(--surface)}
+.one{font-size:18px;font-weight:500}
+.ps{display:grid;grid-template-columns:76px 1fr;gap:6px 14px}
+.ps dt{font-family:var(--f-mono);font-size:12.5px;color:var(--muted);padding-top:3px}
+.ps dd{margin:0;min-width:0}
+
+.ledger{border:1px solid var(--line);border-radius:10px;background:var(--surface);display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+.ledger div{padding:14px 16px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:2px;min-width:0}
+.ledger .v{font-family:var(--f-mono);font-size:21px;font-weight:500;font-variant-numeric:tabular-nums;color:var(--fg)}
+.ledger .k{font-size:13px;color:var(--muted);line-height:1.45}
+
+.dec{display:flex;flex-direction:column;gap:12px;margin:0;padding:0;list-style:none}
+.dec li{display:grid;grid-template-columns:auto 1fr;gap:10px}
+.dec li::before{content:"→";font-family:var(--f-mono);color:var(--accent)}
+.dec b{font-weight:600}
+.stack{display:flex;flex-wrap:wrap;gap:6px}
+.stack span{font-family:var(--f-mono);font-size:12.5px;padding:2px 8px;border:1px solid var(--line);border-radius:4px;color:var(--muted);background:var(--surface)}
+.links{display:flex;flex-wrap:wrap;gap:8px 18px;font-family:var(--f-mono);font-size:14px}
+
+.ba{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+.ba figure{margin:0;display:flex;flex-direction:column;gap:6px;min-width:0}
+.ba figcaption{font-family:var(--f-mono);font-size:12.5px;color:var(--muted)}
+.vid{aspect-ratio:9/16;max-width:100%;max-height:420px;border-radius:10px;background:var(--accent-soft);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;text-align:center;font-size:13px;color:var(--muted);overflow:hidden}
+.vid video{width:100%;height:100%;object-fit:contain;display:block;background:#000}
+.iter summary{cursor:pointer;font-family:var(--f-mono);font-size:13.5px;color:var(--accent)}
+.strip{display:flex;gap:12px;overflow-x:auto;padding-block:12px 6px;scroll-snap-type:x mandatory}
+.strip figure{margin:0;flex:0 0 150px;display:flex;flex-direction:column;gap:6px;scroll-snap-align:start}
+.strip video{width:150px;aspect-ratio:9/16;object-fit:contain;background:#000;border-radius:8px;display:block}
+.strip figcaption{font-size:12px;color:var(--muted);line-height:1.4}
+.strip figcaption b{color:var(--fg);font-family:var(--f-mono);font-weight:500}
+.small{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px}
+.small article{gap:12px}
+.small h3{font-size:20px}
+
+/* 소개 */
+.about{display:grid;grid-template-columns:1.4fr 1fr;gap:32px}
+.about .bio{display:flex;flex-direction:column;gap:12px;min-width:0}
+.cv{display:flex;flex-direction:column;gap:14px;margin:0}
+.cv div{display:grid;grid-template-columns:92px 1fr;gap:4px 12px}
+.cv dt{font-family:var(--f-mono);font-size:13px;color:var(--muted)}
+.cv dd{margin:0;min-width:0}
+.cv dd small{display:block;color:var(--muted);font-size:13.5px}
+.bio .dec li::before{content:"·"}
+
+/* 기술 */
+.skills{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px 28px}
+.skills div{display:flex;flex-direction:column;gap:8px;min-width:0}
+.skills b{font-family:var(--f-display);font-size:14px;font-weight:800}
+
+/* 연락 */
+.contact{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.contact .addr{font-family:var(--f-mono);font-size:16px;user-select:all}
+.contact button{font-family:var(--f-mono);font-size:13px;padding:6px 12px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--fg);cursor:pointer}
+footer{color:var(--muted);font-size:13px;font-family:var(--f-mono)}
+@media (max-width:640px){.about{grid-template-columns:1fr}}
+@media (max-width:480px){.ps{grid-template-columns:1fr}.ps dt{padding-top:8px}}
+</style>
+
+<div class="wrap">
+
+<nav><div class="in">
+  <a class="me" href="#top">정성운</a>
+  <ul><li><a href="#projects">프로젝트</a></li><li><a href="#nutti">누띠</a></li><li><a href="#about">소개</a></li><li><a href="#ways">방식</a></li><li><a href="#skills">만드는 법</a></li><li><a href="#contact">연락</a></li><li><a href="../">AX용 보기 ↗</a></li></ul>
+</div></nav>
+
+<header id="top">
+  <div class="txt">
+    <span class="role">AI 백엔드 개발자 · Python · FastAPI · PostgreSQL · Claude Code</span>
+    <h1>정성운</h1>
+    <p class="thesis">모델을 고르는 일부터<br><em>검증·비용·운영</em>까지</p>
+    <p class="lede">LLM·비전·영상 생성 모델을 실제 업무 파이프라인에 붙여 운영까지 가져가는 백엔드 개발자입니다. 2026년 반년 동안 AI가 들어간 서비스 5개를 혼자 또는 2인 팀으로 기획·백엔드·디자인 검수·QA 까지 맡았습니다. 사내 업무용 2개는 지금 돌고 있고, 적은 비용으로 광고 효율을 내려던 3개는 효과가 나오지 않아 접었습니다. 접은 이유도 숫자로 남겼습니다.</p>
+    <div class="cta"><a class="pri" href="#p-zenith">제니스</a><a href="#p-playground">사진 놀이터</a><a href="#p-lead">Lead-Crawler</a><a href="https://app.notion.com/p/Nutti-36ea47166046800690bef4b2c63b81da?source=copy_link">Notion 워크스페이스 ↗</a></div>
+  </div>
+  <div class="stats">
+    <div><span class="v">5개</span><span class="k">AI 들어간 실무 서비스 · 기획부터 운영까지</span></div>
+    <div><span class="v">$0.211 → $0.053</span><span class="k">이미지 생성 장당 단가, 4배 절감</span></div>
+    <div><span class="v">884 → 73ms</span><span class="k">2.4만 행 검수 큐 조회, 12배 개선</span></div>
+    <div><span class="v">2,000+</span><span class="k">백엔드 테스트 함수 (5개 레포 합산)</span></div>
+  </div>
+</header>
+
+<section id="ways">
+  <h2>AI를 다루는 방식</h2>
+  <div class="ways">
+    <div><b>모델 출력은 믿지 않고 검증한다</b><span>팩트체크는 tool use로 구조화 출력을 강제하고, 결과 마커가 없으면 FAIL. 영상 클립은 비전 모델로 QC해 문제 비트만 재생성. 답변에는 검색 근거 각주를 붙입니다.</span></div>
+    <div><b>모델은 실측으로 고른다</b><span>영상 모델 4회 교체, 대본 모델 Gemini→Claude 복귀, 이미지 단가 $0.211→$0.053. 품질·단가·쿼터를 숫자로 비교해 결정하고 버린 코드는 지웁니다.</span></div>
+    <div><b>사람이 끼어드는 지점을 설계한다</b><span>텔레그램 3단계 검수, 승인 없으면 발송되지 않는 소셜 리스닝, 검증만 하는 리드 웹앱. 자동화 범위와 사람 승인 지점을 먼저 정합니다.</span></div>
+    <div><b>안 되면 숫자로 접는다</b><span>마케팅 실험 셋은 기술은 돌았지만 유입이 없었습니다. 편당 비용·생성 건수·트래픽을 보고 멈췄고, 거기서 만든 팩트체크·비용 원장·큐 설계는 사내 서비스로 가져갔습니다.</span></div>
+    <div><b>비용은 원장으로 관리한다</b><span>편당·장당 단가를 기록하고 월 상한 가드를 둡니다. 광고 자동화 월 $37–67, Lead-Crawler 7월 API 비용은 예산의 22%.</span></div>
+    <div><b>프롬프트 경계를 지킨다</b><span>사용자 데이터는 데이터 구간으로 격리해 인젝션을 막고, AI 는 질문한 사람의 권한 범위만 열람합니다. 외부 호출은 provider 모듈 한 곳으로만 나갑니다.</span></div>
+    <div><b>키 없이도 전 구간이 돈다</b><span>모든 AI 파이프라인에 dry-run을 기본값으로 두었고, CI는 실키 없이 끝까지 재현합니다.</span></div>
+  </div>
+</section>
+
+<section>
+  <h2>타임라인</h2>
+  <div class="timeline"><div class="tl">
+    <span></span><span class="m">5월</span><span class="m">6월</span><span class="m">7월</span><span class="m">8월</span><span class="m">9월</span><span class="m">10월</span>
+    <span class="n">간식 계산기</span><span class="bar" style="grid-column:2"></span>
+    <span class="n">누띠몰</span><span class="bar" style="grid-column:3"></span>
+    <span class="n">AI 광고 자동화</span><span class="bar" style="grid-column:3/5"></span>
+    <span class="n">Lead-Crawler</span><span class="bar" style="grid-column:3/5"></span>
+    <span class="n" style="grid-row:6"></span><span class="bar maint" style="grid-row:6;grid-column:4/8;opacity:.8"></span>
+    <span class="n">sns댓글봇</span><span class="bar" style="grid-column:4/7"></span>
+    <span class="n">사진 놀이터</span><span class="bar" style="grid-column:5/7"></span>
+    <span class="n">제니스</span><span class="bar" style="grid-column:5/8"></span>
+  </div></div>
+  <p class="label" style="margin-top:10px">진한 막대: 개발 · 옅은 막대: Lead-Crawler 유지보수</p>
+</section>
+
+<section id="projects">
+  <h2>주요 프로젝트</h2>
+  <div class="proj">
+
+  <article id="p-zenith">
+    <div class="head"><h3>제니스 Zenith</h3><span class="pill">개발 중 · 사내 테스트</span></div>
+    <div class="meta"><span>01 / 03</span><span>2026.08 – 현재</span><span>백엔드 겸 PM · 2인 팀(프론트 1)</span></div>
+    <p class="one">채팅·문서 공동편집·등급별 게시판·전자결재·근태에 사내 문서를 근거로 답하는 AI 어시스턴트를 합친 15명 규모 사내 협업툴.</p>
+    <dl class="ps">
+      <dt>문제</dt><dd>업무 대화와 문서가 외부 SaaS 여러 곳에 흩어져 있었고, 회사 문서를 알고 답해 주는 AI 가 없었습니다.</dd>
+      <dt>해결</dt><dd>자체 서버 한 대에 모으고, 문서·게시글·결재·근태를 도구로 읽는 AI 어시스턴트를 얹었습니다. AI 호출은 provider 모듈 한 곳으로만 나가게 경계를 두어 공급자를 바꿔도 나머지 코드는 그대로입니다.</dd>
+    </dl>
+    <div class="ledger">
+      <div><span class="v">343</span><span class="k">백엔드 테스트 함수</span></div>
+      <div><span class="v">56ms</span><span class="k">통합검색 · 메시지 6만 건 규모</span></div>
+      <div><span class="v">14.7ms</span><span class="k">채팅 전달 p95 (로컬 측정)</span></div>
+      <div><span class="v">487</span><span class="k">머지된 PR · 백엔드는 단독</span></div>
+    </div>
+    <ul class="dec">
+      <li><span><b>근거를 다는 사내 AI.</b> Claude tool use에 FTS와 pgvector(bge-m3) 결과를 RRF로 합친 하이브리드 검색을 붙여 답변마다 각주를 답니다. 규정 전문 투입, 문서·첨부 읽기, 엑셀 생성, 채팅 <span class="mono">/ai</span> 명령까지 도구로 확장했습니다.</span></li>
+      <li><span><b>AI 도 권한 밖은 못 본다.</b> AI 가 쓰는 검색·열람 도구는 질문한 사람의 권한 그대로만 동작합니다. 임원 글은 사원에게 403, 결재 열람은 기안자·결재선 관계로 판정하고, 이 경계를 테스트로 고정했습니다.</span></li>
+      <li><span><b>공급자 전환과 스트리밍 분리.</b> 로컬 Ollama 로 시작해 품질·운영 부담을 실측한 뒤 Claude API 로 바꿨습니다. 답변 생성을 WebSocket 연결과 분리해 화면을 다시 열어도 만들던 답을 이어 받습니다.</span></li>
+      <li><span><b>보안 하드닝.</b> CSP를 Report-Only에서 실제 적용으로 승격했습니다. 로그아웃 시 Clear-Site-Data를 보내고, 첨부는 실제 글에 실린 파일만 올린 본인만 다시 쓸 수 있게 막았습니다.</span></li>
+      <li><span><b>2인 트렁크 운영.</b> OpenAPI 계약 테스트로 FE↔BE 명세가 최신인지 CI가 검사합니다. 사람 대신 AI 교차 리뷰를 거쳐 self-merge하고, 하루 9~12건 PR 을 머지한 날도 있습니다. 계약이 바뀌면 당일 프론트가 인수하는 이슈 체계를 운영했습니다.</span></li>
+    </ul>
+    <div class="stack"><span>Claude API (tool use)</span><span>pgvector</span><span>bge-m3</span><span>FastAPI</span><span>PostgreSQL 16</span><span>WebSocket</span><span>Yjs/pycrdt</span><span>MinIO</span><span>Docker Compose</span><span>Caddy</span><span>Tailscale</span><span>GitHub Actions</span></div>
+    <div class="links"><a href="https://github.com/N-utti/zenith">GitHub ↗</a><span class="label">배포: 사내망 전용</span></div>
+  </article>
+
+  <article id="p-playground">
+    <div class="head"><h3>누띠 사진 놀이터</h3><span class="pill">프로덕션 배포 후 드랍 · 트래픽 부재</span></div>
+    <div class="meta"><span>02 / 03</span><span>2026.08 – 09</span><span>백엔드·PO · 2인 팀(프론트 1)</span></div>
+    <p class="one">강아지 사진 한 장을 AI 스타일 이미지로 바꿔 주고, 그 경험을 크레딧 보상으로 쇼핑몰 구매까지 잇는 웹 서비스.</p>
+    <dl class="ps">
+      <dt>문제</dt><dd>신생 브랜드라 쇼핑몰로 사람을 데려올 장치가 필요했습니다.</dd>
+      <dt>해결</dt><dd>로그인 없이 바로 써 보는 게스트 체험을 앞에 두었습니다. 크레딧은 쇼핑몰 연동 +3, 주문 +20을 줘서 연동과 구매로 이어지게 했습니다.</dd>
+      <dt>결과</dt><dd>결과물 품질은 만족할 만큼 나왔고 7일간 실생성 72건까지 확인했지만, 홍보 채널과 마케팅 지식이 없어 트래픽을 만들지 못했습니다. 제품은 완성됐는데 사람이 오지 않아 접었습니다.</dd>
+    </dl>
+    <div class="ledger">
+      <div><span class="v">$0.211→$0.053</span><span class="k">이미지 1장 생성 단가 · 약 4배 절감</span></div>
+      <div><span class="v">~280장/h</span><span class="k">워커 슬롯 4개 · 장당 p95 59초</span></div>
+      <div><span class="v">0건</span><span class="k">QA에서 실패 후 환불 누락</span></div>
+      <div><span class="v">229</span><span class="k">테스트 · 2GB VPS 한 대 운영</span></div>
+    </div>
+    <ul class="dec">
+      <li><span><b>이미지 모델 단가 4배 절감.</b> fal 경유 GPT Image 로 바꾸고 quality 를 명시해 장당 $0.211 → $0.053 으로 낮췄습니다. 안전필터 차단·생성 실패는 크레딧을 자동 환불해 사용자가 손해 보지 않게 했습니다.</span></li>
+      <li><span><b>Postgres 잡 큐.</b> Redis를 기각하고 Postgres로 큐를 만들었습니다. 두 워커가 같은 잡을 집는 레이스를 <span class="mono">SKIP LOCKED</span>와 상태 전이를 한 트랜잭션으로 묶어 고쳤습니다. 워커를 늘려도 따로 조율할 필요가 없습니다.</span></li>
+      <li><span><b>크레딧 원장.</b> 지우지 않고 쌓기만 하는 원장에 dedupe_key로 멱등성을 보장했습니다. 생성 실패나 안전 차단 시에는 자동으로 환불합니다.</span></li>
+      <li><span><b>외부 제약을 실측으로 확인하고 재설계.</b> 카페24 OAuth가 운영자 전용이라 고객 계정은 연동할 수 없다는 걸 확인했습니다. Admin API로 회원을 조회한 뒤 SMS OTP로 본인을 확인하는 방식으로 바꿨습니다.</span></li>
+    </ul>
+    <div class="stack"><span>GPT Image (fal)</span><span>FastAPI</span><span>Tortoise ORM</span><span>PostgreSQL</span><span>Cloudflare R2</span><span>카페24 API</span><span>Docker Compose</span><span>Caddy</span></div>
+    <div class="links"><a href="https://github.com/N-utti/nutti-photo-playground">GitHub ↗</a><a href="http://play.nutti.co.kr/">play.nutti.co.kr ↗</a></div>
+  </article>
+
+  <article id="p-lead">
+    <div class="head"><h3>Lead-Crawler</h3><span class="pill done">MVP 완료 · 운영 중</span></div>
+    <div class="meta"><span>03 / 03</span><span>2026.06 – 07 개발, 이후 유지보수 (v1.40.0)</span><span>기안·크롤러·백엔드·배포 주도 · 프론트 1명 합류</span></div>
+    <p class="one">전 산업 기업의 IR 연락처를 24시간 자동 수집하고, 직원은 웹앱에서 검증만 하는 리드 수집 시스템.</p>
+    <dl class="ps">
+      <dt>문제</dt><dd>IR 콜드메일 대상 수집을 직원이 손으로 하고 있었습니다. 월 인건비가 1,000만 원 이상 들었습니다.</dd>
+      <dt>해결</dt><dd>수집은 크롤러가 하고 사람은 검증만 합니다. 운영비 상한은 월 50만 원으로 두고 원장으로 관리했습니다. 2026년 7월 API 비용은 예산의 22%였습니다.</dd>
+    </dl>
+    <div class="ledger">
+      <div><span class="v">884→73ms</span><span class="k">검수 큐 2.4만 행 조회 · 12배 개선</span></div>
+      <div><span class="v">43,347</span><span class="k">발견한 기업 원장 (MVP 시점)</span></div>
+      <div><span class="v">1,771</span><span class="k">검증 대기 이메일 · 실존 기업 1,498곳</span></div>
+      <div><span class="v">1,383</span><span class="k">테스트 함수 · 본인 PR 402/516</span></div>
+    </div>
+    <ul class="dec">
+      <li><span><b>비싼 모델은 마지막에.</b> 이메일 추출은 정적 HTML, 헤드리스 브라우저, OCR, 이메일 API, Claude Vision 순서로 내려가며 앞 단계에서 찾으면 멈춥니다. 도메인 해석도 검색 API 3단계 폴백 뒤에만 LLM 이 중재합니다.</span></li>
+      <li><span><b>쿼리 병목 추적.</b> EXPLAIN ANALYZE로 정렬 키의 상관 서브쿼리가 24,470번 실행되는 걸 찾아 LEFT JOIN으로 바꿨습니다. 회귀 테스트 150개 통과를 확인했습니다.</span></li>
+      <li><span><b>규칙 대신 LLM 분류, 멱등하게.</b> 업종코드 자릿수 규칙이 라벨을 잘못 붙이는 걸 발견하고, 42개 택소노미에 3층 LLM 매핑으로 다시 만들었습니다. 새 코드만 처리하고 결과를 캐시해 재실행해도 비용이 늘지 않습니다.</span></li>
+      <li><span><b>데이터 품질 사고 대응.</b> 운영 중 'listed' 오라벨 1.8만 건 핫픽스, 중복 3,133쌍 병합, WAF 403 오탐으로 탈락한 114곳 생존 인정, 비용 원장 0원 누계로 디스패치가 2일 멈춘 사고의 재발 방지까지 각각 PR 과 회귀 테스트로 닫았습니다.</span></li>
+      <li><span><b>해외 소스 확장.</b> 일본 협회 명부, 거래소 10개국, 유럽·신흥 8소스를 더해 국가 선택 72개국. 수집 상한은 500→5,000.</span></li>
+      <li><span><b>무인 운영.</b> 연속 크롤 모드, 좀비 프로세스 워치독, 재시작 후 잡 자동 재개, 월 예산 가드, Notion 일일보고 자동 작성까지 갖췄습니다.</span></li>
+    </ul>
+    <div class="stack"><span>Claude Vision</span><span>LLM 분류·중재</span><span>Python</span><span>httpx</span><span>Playwright</span><span>OCR</span><span>FastAPI</span><span>PostgreSQL</span><span>SQLAlchemy</span><span>DART·EDGAR·GLEIF API</span><span>Docker</span></div>
+    <div class="links"><a href="https://github.com/wjdtjddns98/lead-crawler">GitHub ↗</a><span class="label">배포: 사내망 전용</span></div>
+  </article>
+
+  </div>
+</section>
+
+<section id="more">
+  <h2>마케팅 자동화 실험 — 접은 것들</h2>
+  <p style="margin-bottom:20px;max-width:40em">광고 자동화 → 댓글 자동화 → 사진 놀이터 순서로, 적은 비용으로 광고 효율을 내려는 실험을 셋 했습니다. 기술은 셋 다 돌아갔지만 마케팅 지식이 부족해 효과를 내지 못했고, 모두 드랍했습니다. 무엇을 만들었고 왜 안 됐는지는 아래에 그대로 적습니다.</p>
+  <div class="proj">
+
+  <article>
+    <div class="head"><h3>AI 광고 자동화</h3><span class="pill">드랍 · 2026.07</span></div>
+    <div class="meta"><span>2026.06 – 07</span><span>1인 개발 (기획·백엔드·인프라·운영)</span></div>
+    <p class="one">대본 생성부터 팩트체크, AI 영상, 사람 검수, 유튜브 업로드까지 쇼츠 제작을 자동화하려 했던 파이프라인. 한 달간 품질과 비용 사이를 오가다 접은 프로젝트입니다.</p>
+    <dl class="ps">
+      <dt>목표</dt><dd>작은 팀이 수의학적으로 맞는 쇼츠를 매일 올리되, 사람은 텔레그램 버튼으로 검수만 하는 것.</dd>
+      <dt>결과</dt><dd>영상 3편을 끝까지 만들어 유튜브에 올렸습니다. 품질과 비용은 한 달간 손봤지만, 올린 영상이 유입으로 이어지지 않았고 그걸 풀 마케팅 지식이 없어 드랍했습니다.</dd>
+    </dl>
+    <div class="ba">
+      <figure><figcaption>Before · mk1, 첫 완주본</figcaption><div class="vid"><video controls preload="metadata" playsinline src="../media/mk01.mp4"></video></div></figure>
+      <figure><figcaption>After · mk17, 마지막 버전 (비트 공백 최소화)</figcaption><div class="vid"><video controls preload="metadata" playsinline src="../media/mk17.mp4"></video></div></figure>
+    </div>
+    <details class="iter">
+      <summary>중간 버전 전부 보기 — mk1 → mk17, 무엇이 망가졌고 무엇을 고쳤나 (17편)</summary>
+      <div class="strip">
+        <figure><video controls preload="none" playsinline src="../media/mk01.mp4"></video><figcaption><b>mk1</b> 첫 완주본</figcaption></figure>
+        <figure><video controls preload="none" playsinline src="../media/mk02.mp4"></video><figcaption><b>mk2</b></figcaption></figure>
+        <figure><video controls preload="none" playsinline src="../media/mk02b.mp4"></video><figcaption><b>mk2-2</b> 8초 경계 스티칭 샘플 · Kling 립싱크 불가</figcaption></figure>
+        <figure><video controls preload="none" playsinline src="../media/mk03.mp4"></video><figcaption><b>mk3</b> 자막 억제 테스트</figcaption></figure>
+        <figure><video controls preload="none" playsinline src="../media/mk05.mp4"></video><figcaption><b>mk5</b> 4비트 풀영상 · 일관성·자막 오류</figcaption></figure>
+        <figure><video controls preload="none" playsinline src="../media/mk06.mp4"></video><figcaption><b>mk6</b> Kling · 립싱크 안 됨</figcaption></figure>
+        <figure><video controls preload="none" playsinline src="../media/mk07.mp4"></video><figcaption><b>mk7</b> Gemini · 품질 낮음, 립싱크 이상</figcaption></figure>
+        <figure><video controls preload="none" playsinline src="../media/mk08.mp4"></video><figcaption><b>mk8</b> 영상+TTS 분리 합성 · 싱크 엉망</figcaption></figure>
+        <figure><video controls preload="none" playsinline src="../media/mk09.mp4"></video><figcaption><b>mk9</b></figcaption></figure>
+        <figure><video controls preload="none" playsinline src="../media/mk10.mp4"></video><figcaption><b>mk10</b> Gemini · 영상 품질 엉망</figcaption></figure>
+        <figure><video controls preload="none" playsinline src="../media/mk11.mp4"></video><figcaption><b>mk11</b> 페르소나 과함</figcaption></figure>
+        <figure><video controls preload="none" playsinline src="../media/mk12.mp4"></video><figcaption><b>mk12</b></figcaption></figure>
+        <figure><video controls preload="none" playsinline src="../media/mk13.mp4"></video><figcaption><b>mk13</b> 페르소나 고장 · 전부 엉망</figcaption></figure>
+        <figure><video controls preload="none" playsinline src="../media/mk14.mp4"></video><figcaption><b>mk14</b> 품질·일관성·립싱크 해결</figcaption></figure>
+        <figure><video controls preload="none" playsinline src="../media/mk15.mp4"></video><figcaption><b>mk15</b> 페르소나 변경 · 품질 향상</figcaption></figure>
+        <figure><video controls preload="none" playsinline src="../media/mk16.mp4"></video><figcaption><b>mk16</b> 포맷 변경 · 비트 사이 공백</figcaption></figure>
+        <figure><video controls preload="none" playsinline src="../media/mk17.mp4"></video><figcaption><b>mk17</b> 비트 공백 최소화 · 최적화</figcaption></figure>
+      </div>
+    </details>
+    <ul class="dec">
+      <li><span><b>품질을 잡으려고 한 것.</b> 영상 모델을 네 번 바꿨습니다. Kling 무음 영상에 TTS 를 합치면 입 모양과 소리가 어긋났고, 한국어 음성을 함께 내는 Veo 3.1 로 돌아갔습니다. 비트 사이 끊김은 끝프레임 고정과 디졸브로, 음색 차이는 음성 seed 고정으로 줄였습니다. 프리즈·블랙·무발화·깨진 자막은 비전 모델 QC 로 잡아 문제 비트만 재생성했습니다. 대본도 Gemini 로 바꿔 봤다가 품질 때문에 Claude 로 되돌렸습니다.</span></li>
+      <li><span><b>비용을 깎으려고 한 것.</b> 편당 $2.74 에서 $1.45 까지 내렸고 월 30편 기준 $37–67 로 기획 추정($175–252)보다 낮췄습니다. 쿼터 문제는 결제처를 fal.ai 하나로 모아 풀었습니다.</span></li>
+      <li><span><b>왜 접었나.</b> 만드는 쪽은 자동화됐지만 보는 사람을 모으는 쪽은 아니었습니다. 조회수와 전환이 따라오지 않았고, 콘텐츠를 어떻게 퍼뜨릴지는 개발로 풀 수 있는 문제가 아니었습니다.</span></li>
+      <li><span><b>남긴 것.</b> 팩트체크를 fail-safe 로 두는 구조(결과 마커 없으면 FAIL, 대본은 데이터 구간으로 격리), 편당 비용 원장, dry-run 기본값은 이후 프로젝트에 그대로 가져갔습니다.</span></li>
+    </ul>
+    <div class="stack"><span>Claude tool use</span><span>Claude Vision</span><span>Veo 3.1 (fal.ai)</span><span>FLUX Kontext</span><span>Python</span><span>FFmpeg</span><span>Telegram Bot</span><span>YouTube API</span><span>Docker</span><span>Ofelia</span></div>
+    <div class="links"><a href="https://github.com/wjdtjddns98/Auto-advertisement-Solution">GitHub ↗</a><a href="https://www.youtube.com/@%EB%88%84%EB%9D%A0%EC%95%BC%EC%95%8C%EB%A0%A4%EC%A4%98">YouTube 채널 ↗</a></div>
+  </article>
+
+  <article>
+    <div class="head"><h3>sns댓글봇</h3><span class="pill">개발 완료 · Meta 검수 통과 · 실사용 안 함</span></div>
+    <div class="meta"><span>2026.07 – 09</span><span>백엔드 전담 · 2인 팀(프론트 1)</span></div>
+    <p class="one">SNS와 커뮤니티에서 키워드 게시글을 감지해 모으고, 사람이 승인해야만 답글이 나가는 소셜 리스닝 도구.</p>
+    <dl class="ps">
+      <dt>문제</dt><dd>처음 요청은 댓글을 자동으로 뿌리는 봇이었습니다. 플랫폼 약관 위반, 스팸, 여론조작 위험이 컸습니다.</dd>
+      <dt>해결</dt><dd>사람 승인형으로 범위를 다시 정하고 요청자와 합의했습니다. 자동 발송 경로는 코드에 아예 만들지 않았습니다.</dd>
+      <dt>결과</dt><dd>개발을 끝내고 Meta 앱 검수까지 통과해 정상 동작합니다. 그러나 사람이 건건이 승인해 다는 답글로는 유입 효과가 나지 않는다고 판단해 실사용하지 않기로 했습니다.</dd>
+    </dl>
+    <div class="ledger">
+      <div><span class="v">2 → 1</span><span class="k">동시 승인 2건이 발송 1건으로 처리됨</span></div>
+      <div><span class="v">5종</span><span class="k">수집 소스 · Threads·네이버·카페·커뮤니티</span></div>
+      <div><span class="v">106건</span><span class="k">첫 실환경 조정에서 매칭한 게시글</span></div>
+      <div><span class="v">8건</span><span class="k">설계 리뷰 MUST-FIX 반영</span></div>
+    </div>
+    <ul class="dec">
+      <li><span><b>DB가 보증하는 정확히 한 번 발송.</b> 승인 시 CAS로 클레임하고, 발송 기록에 partial unique index를 걸었습니다. sending에 멈춘 건은 sweep으로 회수합니다.</span></li>
+      <li><span><b>Meta 앱 검수 통과.</b> Threads 권한 6종을 신청해 재반려를 거쳐 승인받았습니다. 자동 발송 없는 사람 승인형 구조가 심사 근거가 되었습니다.</span></li>
+      <li><span><b>자격증명 구조적 보호.</b> 토큰은 별도 테이블에 Fernet으로 암호화하고 MultiFernet으로 키를 회전합니다. 응답·로그·URL에 노출되지 않는 것을 테스트로 고정했습니다.</span></li>
+      <li><span><b>최소 아키텍처.</b> 별도 워커, Redis, JWT를 과설계로 기각하고 Postgres와 프로세스 안 스케줄러로 운영합니다. 워커를 분리할 부하 기준은 미리 문서로 정해 두었습니다.</span></li>
+    </ul>
+    <div class="stack"><span>FastAPI</span><span>Tortoise ORM</span><span>PostgreSQL</span><span>APScheduler</span><span>Fernet</span><span>argon2</span><span>세션+CSRF</span><span>Threads API</span></div>
+    <div class="links"><a href="https://github.com/N-utti/SNS-bot">GitHub ↗</a><span class="label">배포: 사내망 전용</span></div>
+  </article>
+
+  </div>
+</section>
+
+<section id="nutti">
+  <h2>누띠 브랜드 웹 — 기획부터 디자인·개발까지</h2>
+  <p style="margin-bottom:20px;max-width:40em">반려동물 수제간식 브랜드 '누띠'의 온라인 접점은 기획, 디자인, 웹개발을 전부 맡았습니다. 판매 아이템 선정과 상품 간 상호작용 리서치부터 쇼핑몰 테마 색상, 유입 도구까지 한 흐름으로 설계했고, 위의 마케팅 실험 세 개도 모두 이 쇼핑몰로 사람을 보내려는 장치였습니다.</p>
+  <div class="small">
+    <article>
+      <div class="head"><h3>누띠몰</h3></div>
+      <div class="meta"><span>2026.06 · 기획·디자인·개발</span></div>
+      <p>카페24 기반 자사 쇼핑몰. 카테고리 구조와 테마 색상을 정하고, 도메인 연결, 네이버 소셜 로그인, 카카오톡 상담, 동영상 리뷰 기능, SEO 미리보기 오류 수정까지 했습니다.</p>
+      <div class="stack"><span>카페24 스킨</span><span>네이버 로그인 API</span><span>DNS</span></div>
+      <div class="links"><a href="https://nutti.co.kr">nutti.co.kr ↗</a></div>
+    </article>
+    <article>
+      <div class="head"><h3>누띠 간식 계산기</h3></div>
+      <div class="meta"><span>2026.05 · 기획·디자인·개발</span></div>
+      <p>반려견 정보로 하루 간식 적정량을 계산하고, 상품 간 상호작용 규칙에 따라 판매 상품을 추천하는 유입용 웹 도구. 광고 영상의 CTA로도 씁니다.</p>
+      <div class="stack"><span>Vanilla JS</span><span>GA</span><span>GitHub Pages</span></div>
+      <div class="links"><a href="https://wjdtjddns98.github.io/Nutti-Calculator/">배포 ↗</a><a href="https://github.com/wjdtjddns98/Nutti-Calculator">GitHub ↗</a></div>
+    </article>
+  </div>
+</section>
+
+<section id="about">
+  <h2>소개</h2>
+  <div class="about">
+    <div class="bio">
+      <p>개발자 1~2명짜리 팀이라 백엔드만 만들지 않습니다. 입사 첫날 팀 노션 보고 체계를 만들었고, 기획서·사업계획서·주간보고를 쓰고, 화면 시안과 생성 결과물을 검수하고, 실서버 라이브 테스트로 QA 를 돌리고, 경영진 보고까지 제 몫입니다.</p>
+      <p>구현은 Claude Code 와 Codex 교차 리뷰로 속도를 내고, 모델 선택·검증·비용 같은 설계 판단은 실측으로 직접 합니다.</p>
+      <ul class="dec" style="font-size:14.5px">
+        <li><span><b>프로세스.</b> Notion 워크스페이스·보고 DB 설계와 리포트 자동화, GitHub Actions CI, 브랜치 전략, 적대적 리뷰, Codex 교차검증, 설계문서↔코드 차이 관리.</span></li>
+        <li><span><b>행정·보고.</b> OEM 가계약, 사업자등록·통신판매업 신고, Meta 앱 검수 제출 킷, 운영비 산정표, 팀 주간보고 5편.</span></li>
+        <li><span><b>브랜드·디자인.</b> 마스코트 '누티' 제작·브랜드 자산 커밋, 쇼핑몰 테마·카테고리, 생성 프롬프트 v3→v4 튜닝.</span></li>
+        <li><span><b>인프라·운영.</b> VPS 24시간 운영, 사내망 배포, Windows 서버 프로세스 관리, 5분 주기 모니터링 웹훅, 사내 임베딩 서버.</span></li>
+      </ul>
+    </div>
+    <dl class="cv">
+      <div><dt>2026.05 ~</dt><dd>자산운용사 개발팀 · 재직 중<small>AI·백엔드 개발, 프로젝트 5개 기획·백엔드·QA 담당 (5월 말 입사)</small></dd></div>
+    </dl>
+  </div>
+</section>
+
+<section id="skills">
+  <h2>어떻게 만드나</h2>
+  <div class="ways">
+    <div><b>AI 와 함께 짓고, 판단은 내가 한다</b><span>위 프로젝트의 코드 대부분은 Claude Code 로 짰습니다. 각 프로젝트에 쓴 스택을 전부 깊이 안다고 하지 않겠습니다. 제가 하는 일은 무엇을 만들지 정하고, 모델·구조·비용을 실측으로 고르고, 나온 코드를 리뷰·테스트·운영으로 검증하는 것입니다.</span></div>
+    <div><b>리뷰는 두 겹</b><span>역할별 에이전트 팀을 꾸려 병렬로 짓고, 적대적 리뷰 라운드(한 PR 에 24~34건 수정)와 Codex 교차검증으로 한 번 더 봅니다. 셀프 머지 전에 CI 게이트와 OpenAPI 계약 테스트가 막아 줍니다.</span></div>
+    <div><b>꾸준히 손에 쥔 것</b><span>다섯 프로젝트 전부에서 직접 운영한 것: Python · FastAPI · PostgreSQL · Docker Compose · Claude API. 쿼리 플랜을 읽고, 마이그레이션을 돌리고, 서버 장애를 직접 복구한 범위입니다.</span></div>
+    <div><b>팀의 보고 체계를 만들고 자동화했다</b><span>입사 첫날 Notion 워크스페이스를 설계했습니다. 프로젝트 허브, 일일 업무보고·데일리 스크럼·주간보고·트러블슈팅 DB. 이후 커밋 기록으로 데일리 리포트 초안을 자동 생성하는 봇과 Notion 루틴을 붙여, 팀원은 퇴근 전 확인만 하면 되게 했습니다. 크롤러도 자기 일일보고를 Notion 에 직접 씁니다. <a href="https://app.notion.com/p/Nutti-36ea47166046800690bef4b2c63b81da?source=copy_link">워크스페이스 보기 ↗</a></span></div>
+  </div>
+</section>
+
+<section id="contact">
+  <h2>연락</h2>
+  <div class="contact">
+    <span class="addr" id="email">sungwoon@zenithasset.co.kr</span>
+    <button type="button" id="copy">주소 복사</button>
+    <a href="https://github.com/wjdtjddns98" class="mono">github.com/wjdtjddns98 ↗</a>
+    <a href="https://github.com/N-utti" class="mono">github.com/N-utti ↗</a>
+    <a href="https://app.notion.com/p/Nutti-36ea47166046800690bef4b2c63b81da?source=copy_link" class="mono">Notion 워크스페이스 ↗</a>
+  </div>
+</section>
+
+<footer>수치 출처: 각 프로젝트의 Notion 문서·데일리 리포트와 git 기록 (2026-10-27 기준). 지연 시간 중 '로컬 측정'은 네트워크 구간을 뺀 값입니다.</footer>
+</div>
+<script>
+document.getElementById('copy').addEventListener('click',function(){
+  var t=document.getElementById('email').textContent.trim(), b=this;
+  function done(ok){b.textContent=ok?'복사됨':'복사 실패';setTimeout(function(){b.textContent='주소 복사'},1500)}
+  try{navigator.clipboard.writeText(t).then(function(){done(true)},function(){done(false)})}catch(e){done(false)}
+});
+</script>
+
+</body>
+</html>
