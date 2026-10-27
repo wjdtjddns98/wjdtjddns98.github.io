@@ -157,12 +157,10 @@ details.tech .dec{margin-top:14px;font-size:15px}
 .cv dd{margin:0;min-width:0;font-weight:500}
 .cv dd small{display:block;color:var(--muted);font-size:13.5px;font-weight:400;margin-top:2px}
 
-.contact{display:flex;flex-wrap:wrap;align-items:center;gap:6px 22px;font-family:var(--f-mono);font-size:13.5px;margin-top:-4px}
+.contact{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 20px;font-family:var(--f-mono);font-size:13.5px;line-height:1.5;margin-top:-4px}
 .contact .addr{user-select:all;color:var(--fg)}
-.contact button{font:inherit;padding:0;border:0;background:none;color:var(--muted);cursor:pointer;text-decoration:underline;text-underline-offset:4px}
-.contact button:hover{color:var(--fg)}
-.contact a{color:var(--muted);text-decoration:none;border-bottom:1px solid var(--line2);padding-bottom:1px}
-.contact a:hover{color:var(--fg);border-color:var(--fg)}
+.contact button,.contact a{font:inherit;line-height:inherit;padding:0 0 1px;margin:0;border:0;border-bottom:1px solid var(--line2);background:none;color:var(--muted);cursor:pointer;text-decoration:none;display:inline-block;vertical-align:baseline}
+.contact button:hover,.contact a:hover{color:var(--fg);border-color:var(--fg)}
 footer{color:var(--muted);font-size:12.5px;font-family:var(--f-mono);text-align:center}
 
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
