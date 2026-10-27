@@ -148,8 +148,9 @@ details.tech .dec{margin-top:14px;font-size:15px}
 .small article{gap:14px;padding:26px}
 .small h3{font-size:21px}
 
-.about{display:flex;flex-direction:column;gap:28px;max-width:44em}
-.about .bio{display:flex;flex-direction:column;gap:14px;min-width:0}
+.about{display:flex;flex-direction:column;gap:28px;max-width:46em}
+.about .bio{display:flex;flex-direction:column;gap:18px;min-width:0;font-size:16.5px}
+.about .bio p b{font-weight:700}
 .bio .dec li::before{background:var(--line2)}
 .cv{display:flex;flex-direction:column;gap:18px;margin:0;border-top:1px solid var(--fg);padding-top:22px}
 .cv div{display:grid;grid-template-columns:120px 1fr;gap:4px 16px;align-items:baseline}
@@ -410,8 +411,11 @@ footer{color:var(--muted);font-size:12.5px;font-family:var(--f-mono);text-align:
   <h2>소개</h2>
   <div class="about">
     <div class="bio">
-      <p>개발자 1~2명짜리 팀이라 백엔드만 만들지 않습니다. 입사 첫날 팀 노션 보고 체계를 만들었고, 기획서·사업계획서·주간보고를 쓰고, 화면 시안과 생성 결과물을 검수하고, 실서버 라이브 테스트로 QA 를 돌리고, 경영진 보고까지 제 몫입니다.</p>
-      <p>구현은 Claude Code 와 Codex 교차 리뷰로 속도를 내고, 모델 선택·검증·비용 같은 설계 판단은 실측으로 직접 합니다.</p>
+      <p><b>2026년 5월 28일, 입사 첫날.</b> 회사엔 보고 체계가 없었고 개발자는 저 혼자였습니다. 그날 Notion 워크스페이스를 만들고 일일 업무보고와 데일리 스크럼 DB를 세웠습니다. 이 포트폴리오의 수치가 전부 날짜까지 남아 있는 건 그 때문입니다.</p>
+      <p><b>그리고 3주 동안 엑셀을 채웠습니다.</b> 당시 회사의 가장 큰 수작업은 IR 콜드메일 대상 기업을 찾는 일이었습니다. 저와 디자이너까지 7명이 엑셀 한 장을 놓고 기업 이름을 검색하고, 홈페이지를 찾고, 중복을 걸러내고, 연락처를 확인했습니다. 하루 200~300건. 직접 해 보니 어디가 단순 반복이고 어디가 사람 판단이 필요한지 보였습니다. 그걸 기안서로 써서 승인받고, 6월에 만들어 7월 14일에 띄웠습니다. 지금은 검증 담당 3명이 하루 580건을 판정합니다.</p>
+      <p><b>같은 시기에 마케팅 실험을 셋 했습니다.</b> 신생 반려동물 간식 브랜드에 적은 돈으로 사람을 데려오고 싶었습니다. AI 쇼츠 자동 제작, 승인형 SNS 답글, 강아지 사진을 AI 로 바꿔 주는 놀이터. 셋 다 기술은 돌아갔습니다. 영상 모델을 네 번 바꾸며 편당 $1.45 까지 내렸고, Meta 앱 검수도 통과했고, 놀이터 결과물은 저도 마음에 들었습니다. 그런데 사람이 오지 않았습니다. 만드는 쪽은 자동화됐는데 보는 사람을 모으는 쪽은 개발로 풀 문제가 아니었고, 저에게 그 지식이 없었습니다. 셋 다 비용·생성 건수·트래픽을 보고 접었습니다. 이 경험 덕에 지금은 "기술이 되는가"보다 "조직과 시장이 받는가"를 먼저 묻습니다.</p>
+      <p><b>8월부터는 사내로 돌아왔습니다.</b> 회사 대화와 문서가 SaaS 여러 곳에 흩어져 있어, 한 앱으로 모으고 회사 문서를 근거로 답하는 AI 어시스턴트를 얹는 제니스를 시작했습니다. 프론트 1명과 2인 팀, 사람 상호 리뷰 없이 Claude Code 와 Codex 교차검증으로 하루 9~12건을 머지합니다. AI 는 질문한 사람의 권한 그대로만 열람하도록 서버가 판정하고, 외부로 나가는 호출은 모듈 한 곳으로 모았습니다. 지금은 라이브 테스트 중입니다.</p>
+      <p>개발자 출신이라 "AI 로 할 수 있다"와 "AI 로 하면 안 된다"를 직접 만들어 보고 판단합니다. 코드 대부분은 Claude Code 로 짓고, 제 일은 무엇을 바꿀지 정하고, 사람 승인 지점과 권한을 설계하고, 비용과 효과를 숫자로 보고 계속할지 접을지 결정하는 것입니다. 2인 팀이라 백엔드 외의 일도 제 몫이었습니다.</p>
       <ul class="dec" style="font-size:14.5px">
         <li><span><b>프로세스.</b> Notion 워크스페이스·보고 DB 설계와 리포트 자동화, GitHub Actions CI, 브랜치 전략, 적대적 리뷰, Codex 교차검증, 설계문서↔코드 차이 관리.</span></li>
         <li><span><b>행정·보고.</b> OEM 가계약, 사업자등록·통신판매업 신고, Meta 앱 검수 제출 킷, 운영비 산정표, 팀 주간보고 5편.</span></li>
