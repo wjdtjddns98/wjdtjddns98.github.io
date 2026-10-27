@@ -156,9 +156,8 @@ details.tech .dec{margin-top:14px;font-size:15px}
 .cv dd{margin:0;min-width:0;font-weight:500}
 .cv dd small{display:block;color:var(--muted);font-size:13.5px;font-weight:400;margin-top:2px}
 
-.contact{display:flex;flex-direction:column;gap:14px;padding-top:4px}
-.contact .addr{font-family:var(--f-display);font-weight:800;font-size:clamp(24px,4vw,34px);letter-spacing:-.02em;user-select:all;line-height:1.2}
-.contact .row{display:flex;flex-wrap:wrap;align-items:center;gap:6px 22px;font-family:var(--f-mono);font-size:13.5px}
+.contact{display:flex;flex-wrap:wrap;align-items:center;gap:6px 22px;font-family:var(--f-mono);font-size:13.5px;margin-top:-4px}
+.contact .addr{user-select:all;color:var(--fg)}
 .contact button{font:inherit;padding:0;border:0;background:none;color:var(--muted);cursor:pointer;text-decoration:underline;text-underline-offset:4px}
 .contact button:hover{color:var(--fg)}
 .contact a{color:var(--muted);text-decoration:none;border-bottom:1px solid var(--line2);padding-bottom:1px}
@@ -174,15 +173,22 @@ footer{color:var(--muted);font-size:12.5px;font-family:var(--f-mono);text-align:
 
 <nav><div class="in">
   <a class="me" href="#top">정성운</a>
-  <ul><li><a href="#projects">프로젝트</a></li><li><a href="#nutti">누띠</a></li><li><a href="#about">소개</a></li><li><a href="#ways">방식</a></li><li><a href="#skills">만드는 법</a></li><li><a href="#contact">연락</a></li></ul>
+  <ul><li><a href="#projects">프로젝트</a></li><li><a href="#nutti">누띠</a></li><li><a href="#about">소개</a></li><li><a href="#ways">방식</a></li><li><a href="#skills">만드는 법</a></li></ul>
 </div></nav>
 
 <header id="top">
   <div class="txt">
     <h1>정성운</h1>
+    <div class="contact">
+      <span class="addr" id="email">sungwoon@zenithasset.co.kr</span>
+      <button type="button" id="copy">복사</button>
+      <a href="https://github.com/wjdtjddns98">GitHub</a>
+      <a href="https://github.com/N-utti">N-utti</a>
+      <a href="https://app.notion.com/p/Nutti-36ea47166046800690bef4b2c63b81da?source=copy_link">Notion</a>
+    </div>
     <p class="thesis">모델을 고르는 일부터<br><em>검증·비용·운영</em>까지</p>
     <p class="lede">LLM·비전·영상 생성 모델을 실제 업무 파이프라인에 붙여 운영까지 가져가는 백엔드 개발자입니다. 2026년 반년 동안 AI가 들어간 서비스 5개를 혼자 또는 2인 팀으로 기획·백엔드·디자인 검수·QA 까지 맡았습니다. 사내 업무용 2개는 지금 돌고 있고, 적은 비용으로 광고 효율을 내려던 3개는 효과가 나오지 않아 접었습니다. 접은 이유도 숫자로 남겼습니다.</p>
-    <div class="cta"><a class="pri" href="#p-zenith">제니스</a><a href="#p-playground">사진 놀이터</a><a href="#p-lead">Lead-Crawler</a><a href="https://app.notion.com/p/Nutti-36ea47166046800690bef4b2c63b81da?source=copy_link">Notion 워크스페이스 ↗</a></div>
+    <div class="cta"><a class="pri" href="#p-zenith">제니스</a><a href="#p-playground">사진 놀이터</a><a href="#p-lead">Lead-Crawler</a></div>
   </div>
   <div class="stats">
     <div><span class="v">5개</span><span class="k">AI 들어간 실무 서비스 · 기획부터 운영까지</span></div>
@@ -431,18 +437,6 @@ footer{color:var(--muted);font-size:12.5px;font-family:var(--f-mono);text-align:
   </div>
 </section>
 
-<section id="contact">
-  <h2>연락</h2>
-  <div class="contact">
-    <span class="addr" id="email">sungwoon@zenithasset.co.kr</span>
-    <div class="row">
-      <button type="button" id="copy">주소 복사</button>
-      <a href="https://github.com/wjdtjddns98">GitHub</a>
-      <a href="https://github.com/N-utti">GitHub · N-utti</a>
-      <a href="https://app.notion.com/p/Nutti-36ea47166046800690bef4b2c63b81da?source=copy_link">Notion</a>
-    </div>
-  </div>
-</section>
 
 <footer>수치 출처: 각 프로젝트의 Notion 문서·데일리 리포트와 git 기록 (2026-10-27 기준). 지연 시간 중 '로컬 측정'은 네트워크 구간을 뺀 값입니다.</footer>
 </div>
