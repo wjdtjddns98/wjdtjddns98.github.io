@@ -53,10 +53,10 @@ section > h2::before{content:"";position:absolute;left:0;top:.35em;width:6px;hei
 nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;
   margin-inline:calc(-1 * max(16px,env(safe-area-inset-left,0px))) calc(-1 * max(16px,env(safe-area-inset-right,0px)));
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:10px}
-nav .in{max-width:920px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+nav .in{max-width:920px;margin:0 auto;display:flex;align-items:center;justify-content:flex-start;gap:12px;flex-wrap:wrap;
   background:color-mix(in srgb,var(--surface) 62%,transparent);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);border:1px solid color-mix(in srgb,var(--fg) 10%,transparent);border-radius:999px;padding:8px 10px 8px 18px;box-shadow:0 1px 0 color-mix(in srgb,#fff 60%,transparent) inset,0 8px 24px -12px rgba(0,0,0,.18)}
 nav .me{font-family:var(--f-display);font-weight:800;text-decoration:none;color:var(--fg);letter-spacing:-.02em}
-nav ul{display:flex;gap:2px;margin:0;padding:0;list-style:none;font-size:13.5px}
+nav ul{display:flex;gap:2px;margin:0;padding:0;list-style:none;font-size:13.5px;flex-wrap:wrap}
 nav ul a{color:var(--muted);text-decoration:none;padding:6px 12px;border-radius:999px;transition:background .15s,color .15s}
 nav ul a:hover{color:var(--fg);background:var(--bg2)}
 
@@ -198,7 +198,6 @@ footer{color:var(--muted);font-size:12.5px;font-family:var(--f-mono);text-align:
 <div class="wrap">
 
 <nav><div class="in">
-  <a class="me" href="#top">정성운</a>
   <ul><li><a href="#projects">프로젝트</a></li><li><a href="#principles">설계 원칙</a></li><li><a href="#tests">테스트</a></li><li><a href="#more">그 외</a></li><li><a href="#skills">기술</a></li><li><a href="#about">소개</a></li></ul>
 </div></nav>
 
@@ -255,7 +254,7 @@ footer{color:var(--muted);font-size:12.5px;font-family:var(--f-mono);text-align:
     </dl>
     <div class="ledger">
       <div><span class="v">343</span><span class="k">백엔드 테스트 함수</span></div>
-    <div class="arch"><b>아키텍처.</b> FastAPI 프로세스 하나가 REST · WebSocket(채팅·알림·presence) · Yjs 릴레이(pycrdt)를 함께 담고, PostgreSQL 16(FTS tsvector 생성 컬럼 + pgvector) · Redis(세션·presence) · MinIO(첨부) 를 쓴다. Caddy 가 TLS 와 정적 프론트를 맡고, 외부 접속은 Tailscale. AI 호출은 <span class="mono">app/ai/provider.py</span> 한 곳으로만 나가고, 임베딩은 사내 Ollama 의 bge-m3. 답변 생성은 백그라운드 태스크가 DB 에 쓰고 WebSocket 은 구독만 한다. 권한 판정은 서비스 계층 함수 한 곳(<span class="mono">can_view_*</span>)으로 모아 REST·검색·AI 도구가 같은 함수를 부른다. Alembic 마이그레이션, pg_dump 일일 백업, Prometheus 지표, Docker Compose 로 서버 한 대에 배포.</div>
+    <dl class="ps"><dt>아키텍처</dt><dd>FastAPI 프로세스 하나가 REST · WebSocket(채팅·알림·presence) · Yjs 릴레이(pycrdt)를 함께 담고, PostgreSQL 16(FTS tsvector 생성 컬럼 + pgvector) · Redis(세션·presence) · MinIO(첨부) 를 쓴다. Caddy 가 TLS 와 정적 프론트를 맡고, 외부 접속은 Tailscale. AI 호출은 <span class="mono">app/ai/provider.py</span> 한 곳으로만 나가고, 임베딩은 사내 Ollama 의 bge-m3. 답변 생성은 백그라운드 태스크가 DB 에 쓰고 WebSocket 은 구독만 한다. 권한 판정은 서비스 계층 함수 한 곳(<span class="mono">can_view_*</span>)으로 모아 REST·검색·AI 도구가 같은 함수를 부른다. Alembic 마이그레이션, pg_dump 일일 백업, Prometheus 지표, Docker Compose 로 서버 한 대에 배포.</dd></dl>
       <div><span class="v">56ms</span><span class="k">통합검색 · 메시지 6만 건 규모</span></div>
       <div><span class="v">14.7ms</span><span class="k">채팅 전달 p95 (로컬 측정)</span></div>
       <div><span class="v">487</span><span class="k">머지된 PR · 백엔드는 단독</span></div>
@@ -338,7 +337,7 @@ footer{color:var(--muted);font-size:12.5px;font-family:var(--f-mono);text-align:
     </dl>
     <div class="ledger">
       <div><span class="v">$0.211→$0.053</span><span class="k">이미지 1장 생성 단가 · 약 4배 절감</span></div>
-    <div class="arch"><b>아키텍처.</b> api 컨테이너(FastAPI·Tortoise ORM) 와 worker 컨테이너가 PostgreSQL 하나를 큐로 공유한다. 업로드·품질 체크 → <span class="mono">jobs</span> 행 삽입 → 워커가 <span class="mono">FOR UPDATE SKIP LOCKED</span> 로 집어 lease 를 걸고 fal 경유 GPT Image 호출 → 결과 1장을 Cloudflare R2 에 저장 → 클라이언트는 HTTP 폴링. 크레딧은 <span class="mono">credit_ledger</span> append-only, 잔액은 SUM. 카페24 주문 웹훅 → dedupe_key 로 적립, 실패·안전 차단 → refund 행. 2GB VPS 한 대에 Docker Compose + Caddy, 5분 주기 운영 모니터링 웹훅(대기열·워커 사망·메모리·디스크).</div>
+    <dl class="ps"><dt>아키텍처</dt><dd>api 컨테이너(FastAPI·Tortoise ORM) 와 worker 컨테이너가 PostgreSQL 하나를 큐로 공유한다. 업로드·품질 체크 → <span class="mono">jobs</span> 행 삽입 → 워커가 <span class="mono">FOR UPDATE SKIP LOCKED</span> 로 집어 lease 를 걸고 fal 경유 GPT Image 호출 → 결과 1장을 Cloudflare R2 에 저장 → 클라이언트는 HTTP 폴링. 크레딧은 <span class="mono">credit_ledger</span> append-only, 잔액은 SUM. 카페24 주문 웹훅 → dedupe_key 로 적립, 실패·안전 차단 → refund 행. 2GB VPS 한 대에 Docker Compose + Caddy, 5분 주기 운영 모니터링 웹훅(대기열·워커 사망·메모리·디스크).</dd></dl>
       <div><span class="v">~280장/h</span><span class="k">워커 슬롯 4개 · 장당 p95 59초</span></div>
       <div><span class="v">0건</span><span class="k">QA에서 실패 후 환불 누락</span></div>
       <div><span class="v">229</span><span class="k">테스트 · 2GB VPS 한 대 운영</span></div>
@@ -410,7 +409,7 @@ footer{color:var(--muted);font-size:12.5px;font-family:var(--f-mono);text-align:
     </dl>
     <div class="ledger">
       <div><span class="v">884→73ms</span><span class="k">검수 큐 2.4만 행 조회 · 12배 개선</span></div>
-    <div class="arch"><b>아키텍처.</b> Python 크롤러 워커(연속 크롤 모드, 하트비트 워치독) · FastAPI(검수 API·관리자 API) · React 검수 웹앱(프론트 동료) 이 PostgreSQL 하나를 공유한다. 소스별 <span class="mono">discovery_cursor</span> 로 재개 지점을 저장하고, <span class="mono">crawl_job</span>·<span class="mono">backfill_job</span> 상태를 DB 에 두어 재시작 뒤 running 인데 하트비트가 오래된 잡을 pending 으로 되돌린다. 발견 원장(<span class="mono">discovered_company</span>) → 실존 확인 → 추출 → <span class="mono">review_queue</span> → <span class="mono">review_audit</span>(append-only). 외부 API 호출은 <span class="mono">cost_ledger</span> 에 단가×횟수로 기록하고 월 상한에 닿으면 디스패치를 멈춘다. API 키 없이 전 단계를 가짜 응답으로 도는 dry-run 이 기본값이라 CI 가 실키 없이 끝까지 돈다. 사내 Windows 서버에서 supervisor + Job Object 로 프로세스 관리.</div>
+    <dl class="ps"><dt>아키텍처</dt><dd>Python 크롤러 워커(연속 크롤 모드, 하트비트 워치독) · FastAPI(검수 API·관리자 API) · React 검수 웹앱(프론트 동료) 이 PostgreSQL 하나를 공유한다. 소스별 <span class="mono">discovery_cursor</span> 로 재개 지점을 저장하고, <span class="mono">crawl_job</span>·<span class="mono">backfill_job</span> 상태를 DB 에 두어 재시작 뒤 running 인데 하트비트가 오래된 잡을 pending 으로 되돌린다. 발견 원장(<span class="mono">discovered_company</span>) → 실존 확인 → 추출 → <span class="mono">review_queue</span> → <span class="mono">review_audit</span>(append-only). 외부 API 호출은 <span class="mono">cost_ledger</span> 에 단가×횟수로 기록하고 월 상한에 닿으면 디스패치를 멈춘다. API 키 없이 전 단계를 가짜 응답으로 도는 dry-run 이 기본값이라 CI 가 실키 없이 끝까지 돈다. 사내 Windows 서버에서 supervisor + Job Object 로 프로세스 관리.</dd></dl>
       <div><span class="v">43,347</span><span class="k">발견한 기업 원장 (MVP 시점)</span></div>
       <div><span class="v">1,771</span><span class="k">검증 대기 이메일 · 실존 기업 1,498곳</span></div>
       <div><span class="v">1,383</span><span class="k">테스트 함수 · 본인 PR 402/516</span></div>

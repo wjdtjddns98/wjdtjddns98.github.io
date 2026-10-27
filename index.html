@@ -68,10 +68,10 @@ section > h2::before{content:"";position:absolute;left:0;top:.35em;width:6px;hei
 nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;
   margin-inline:calc(-1 * max(16px,env(safe-area-inset-left,0px))) calc(-1 * max(16px,env(safe-area-inset-right,0px)));
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:10px}
-nav .in{max-width:920px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+nav .in{max-width:920px;margin:0 auto;display:flex;align-items:center;justify-content:flex-start;gap:12px;flex-wrap:wrap;
   background:color-mix(in srgb,var(--surface) 62%,transparent);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);border:1px solid color-mix(in srgb,var(--fg) 10%,transparent);border-radius:999px;padding:8px 10px 8px 18px;box-shadow:0 1px 0 color-mix(in srgb,#fff 60%,transparent) inset,0 8px 24px -12px rgba(0,0,0,.18)}
 nav .me{font-family:var(--f-display);font-weight:800;text-decoration:none;color:var(--fg);letter-spacing:-.02em}
-nav ul{display:flex;gap:2px;margin:0;padding:0;list-style:none;font-size:13.5px}
+nav ul{display:flex;gap:2px;margin:0;padding:0;list-style:none;font-size:13.5px;flex-wrap:wrap}
 nav ul a{color:var(--muted);text-decoration:none;padding:6px 12px;border-radius:999px;transition:background .15s,color .15s}
 nav ul a:hover{color:var(--fg);background:var(--bg2)}
 
@@ -187,7 +187,6 @@ footer{color:var(--muted);font-size:12.5px;font-family:var(--f-mono);text-align:
 <div class="wrap">
 
 <nav><div class="in">
-  <a class="me" href="#top">정성운</a>
   <ul><li><a href="#ways">방식</a></li><li><a href="#projects">사례</a></li><li><a href="#labs">실험</a></li><li><a href="#about">소개</a></li></ul>
 </div></nav>
 
