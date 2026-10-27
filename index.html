@@ -37,7 +37,7 @@ body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:16
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
 .wrap{max-width:920px;margin:0 auto;padding-block:24px 96px;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
-  display:flex;flex-direction:column;gap:96px}
+  display:flex;flex-direction:column;gap:72px}
 h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.2;letter-spacing:-.02em}
 p{margin:0}
 a{color:var(--accent);text-decoration-thickness:1px;text-underline-offset:3px}
@@ -54,14 +54,14 @@ nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;
   margin-inline:calc(-1 * max(16px,env(safe-area-inset-left,0px))) calc(-1 * max(16px,env(safe-area-inset-right,0px)));
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:10px}
 nav .in{max-width:920px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
-  background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:8px 10px 8px 18px}
+  background:color-mix(in srgb,var(--surface) 62%,transparent);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);border:1px solid color-mix(in srgb,var(--fg) 10%,transparent);border-radius:999px;padding:8px 10px 8px 18px;box-shadow:0 1px 0 color-mix(in srgb,#fff 60%,transparent) inset,0 8px 24px -12px rgba(0,0,0,.18)}
 nav .me{font-family:var(--f-display);font-weight:800;text-decoration:none;color:var(--fg);letter-spacing:-.02em}
 nav ul{display:flex;gap:2px;margin:0;padding:0;list-style:none;font-size:13.5px}
 nav ul a{color:var(--muted);text-decoration:none;padding:6px 12px;border-radius:999px;transition:background .15s,color .15s}
 nav ul a:hover{color:var(--fg);background:var(--bg2)}
 
 /* 머리 */
-header{display:grid;grid-template-columns:1fr;gap:36px;align-items:start;padding-top:40px}
+header{display:grid;grid-template-columns:1fr;gap:28px;align-items:start;padding-top:12px}
 header .txt{display:flex;flex-direction:column;gap:20px;min-width:0}
 header .role{font-family:var(--f-mono);font-size:13px;color:var(--muted);letter-spacing:.02em;display:inline-flex;align-items:center;gap:8px}
 header .role::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--fg)}
